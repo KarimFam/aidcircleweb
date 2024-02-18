@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using H4H.Domain.Entities;
 
-namespace H4H.Infrastructure.Data
+namespace H4H.Infrastructure.Data.Contexts
 {
     public class H4HDbContext : DbContext
     {

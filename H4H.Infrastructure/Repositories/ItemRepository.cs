@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using H4H.Domain.Entities;
 using H4H.Domain.Interfaces;
-using H4H.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using H4H.Infrastructure.Data.Contexts;
 
 namespace H4H.Infrastructure.Repositories
 {
