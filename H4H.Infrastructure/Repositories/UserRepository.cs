@@ -1,6 +1,6 @@
 ﻿using H4H.Domain.Entities;
 using H4H.Domain.Interfaces;
-using H4H.Infrastructure.Data;
+using H4H.Infrastructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
