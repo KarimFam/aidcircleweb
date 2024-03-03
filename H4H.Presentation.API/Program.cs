@@ -4,12 +4,14 @@ using H4H.Domain.Interfaces;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
 builder.Services.AddDbContext<H4HDbContext>(options =>
-       options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
