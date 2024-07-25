@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Mappers\" />
-    <Folder Include="Validators\" />
+    <Compile Remove="DTOs\**" />
+    <Compile Remove="Mappers\**" />
+    <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="DTOs\**" />
+    <EmbeddedResource Remove="Mappers\**" />
+    <EmbeddedResource Remove="Validators\**" />
+    <None Remove="DTOs\**" />
+    <None Remove="Mappers\**" />
+    <None Remove="Validators\**" />
   </ItemGroup>
 
   <ItemGroup>
