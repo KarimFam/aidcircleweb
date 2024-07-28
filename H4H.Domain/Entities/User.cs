@@ -1,41 +1,54 @@
-﻿using System;
+﻿using H4H.Domain.Entities;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace H4H.Domain.Entities
+public class User : BaseEntity
 {
-    public class User : BaseEntity
+    [JsonPropertyName("username")]
+    [Required, MaxLength(50)]
+    public string Username { get; set; }
+
+    [JsonPropertyName("email")]
+    [Required, EmailAddress, MaxLength(255)]
+    public string Email { get; set; }
+
+    [JsonPropertyName("firstName")]
+    [Required, MaxLength(50)]
+    public string FirstName { get; set; }
+
+    [JsonPropertyName("lastName")]
+    [Required, MaxLength(50)]
+    public string LastName { get; set; }
+
+    [JsonPropertyName("dateOfBirth")]
+    [Required]
+    public DateTime DateOfBirth { get; set; }
+
+    [JsonPropertyName("isActive")]
+    public bool IsActive { get; set; }
+
+    [JsonPropertyName("externalAuthProvider")]
+    [MaxLength(50)]
+    public string ExternalAuthProvider { get; set; }
+
+    [JsonPropertyName("externalAuthId")]
+    [MaxLength(255)]
+    public string ExternalAuthId { get; set; }
+
+    // Relationships
+    [JsonPropertyName("addresses")]
+    public virtual ICollection<Address> Addresses { get; set; }
+
+    [JsonPropertyName("orders")]
+    [InverseProperty("User")]
+    public virtual ICollection<Order> Orders { get; set; }
+
+    public User()
     {
-        [JsonPropertyName("username")]
-        public string Username { get; set; }
-
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
-
-        [JsonPropertyName("firstName")]
-        public string FirstName { get; set; }
-
-        [JsonPropertyName("lastName")]
-        public string LastName { get; set; }
-
-        [JsonPropertyName("dateOfBirth")]
-        public DateTime DateOfBirth { get; set; }
-
-        [JsonPropertyName("isActive")]
-        public bool IsActive { get; set; }
-
-        // External Authentication
-        [JsonPropertyName("externalAuthProvider")]
-        public string ExternalAuthProvider { get; set; }
-
-        [JsonPropertyName("externalAuthId")]
-        public string ExternalAuthId { get; set; }
-
-        // User-specific properties (if any)
+        Addresses = new HashSet<Address>();
+        Orders = new HashSet<Order>();
     }
-
-
 }

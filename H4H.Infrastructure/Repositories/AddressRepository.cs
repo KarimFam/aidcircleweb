@@ -48,5 +48,53 @@ namespace H4H.Infrastructure.Repositories
             _context.Addresses.Remove(entity);
             await _context.SaveChangesAsync();
         }
+
+        // Add missing methods here
+
+        //public async Task<List<Address>> GetByCityAsync(string city)
+        //{
+        //    return await _context.Addresses.Where(a => a.City == city).ToListAsync();
+        //}
+
+        //public async Task<List<Address>> GetByStateAsync(string state)
+        //{
+        //    return await _context.Addresses.Where(a => a.State == state).ToListAsync();
+        //}
+
+        //public async Task<List<Address>> GetByCountryAsync(string country)
+        //{
+        //    return await _context.Addresses.Where(a => a.Country == country).ToListAsync();
+        //}
+
+        //public async Task<List<Address>> GetByPostalCodeAsync(string postalCode)
+        //{
+        //    return await _context.Addresses.Where(a => a.PostalCode == postalCode).ToListAsync();
+        //}
+
+        //public async Task<List<Address>> GetAddressbyUserIDAsync(int userId)
+        //{
+        //    return await _context.Addresses.Where(a => a.AddressableId == userId && a.AddressableType == "User").ToListAsync();
+        //}
+
+        public async Task<List<Address>> GetAddressesByUserIdAsync(int userId)
+        {
+            return await _context.Addresses.Where(a => a.AddressableId == userId && a.AddressableType == "User").ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressesByVolunteerIdAsync(int volunteerId)
+        {
+            return await _context.Addresses.Where(a => a.AddressableId == volunteerId && a.AddressableType == "Volunteer").ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId)
+        {
+            return await _context.Addresses.Where(a => a.AddressableId == organizationId && a.AddressableType == "Organization").ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressesByItemIdAsync(int itemId)
+        {
+            return await _context.Addresses.Where(a => a.AddressableId == itemId && a.AddressableType == "Item").ToListAsync();
+        }
+
     }
 }
