@@ -20,12 +20,12 @@ namespace H4H.Domain.Entities
         [MaxLength(1000)]
         public string Description { get; set; }
 
-        [JsonPropertyName("createdById")]
-        public int CreatedById { get; set; }
+        //[JsonPropertyName("createdById")]
+        //public int CreatedById { get; set; }
 
-        [JsonPropertyName("createdByType")]
-        [Required, MaxLength(50)]
-        public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
+  //    [JsonPropertyName("createdByType")]
+  //    [Required, MaxLength(50)]
+     // public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
 
         [JsonPropertyName("addressId")]
         public int AddressId { get; set; }
@@ -34,20 +34,29 @@ namespace H4H.Domain.Entities
         [ForeignKey("AddressId")]
         public virtual Address Address { get; set; }
 
+
+
         [JsonPropertyName("orderId")]
-        public int? OrderId { get; set; }
+        public int OrderId { get; set; }
+
 
         [JsonPropertyName("order")]
         [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
 
-        //[JsonPropertyName("assignedVolunteers")]
-        //public virtual ICollection<Volunteer> AssignedVolunteers { get; set; }
+        [JsonPropertyName("userId")]
+        public int UserId { get; set; }
 
-        //public Item()
-        //{
-        //    AssignedVolunteers = new HashSet<Volunteer>();
-        //}
+        [JsonPropertyName("user")]
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
+
+        [JsonPropertyName("organizationId")]
+        public int OrganizationId { get; set; }
+
+        [JsonPropertyName("organization")]
+        [ForeignKey("OrganizationId")]
+        public virtual Organization Organization { get; set; }
     }
 
 }

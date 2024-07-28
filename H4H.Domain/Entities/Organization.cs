@@ -23,8 +23,8 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("addresses")]
         public virtual ICollection<Address> Addresses { get; set; }
 
-        [JsonPropertyName("volunteers")]
-        public virtual ICollection<Volunteer> Volunteers { get; set; }
+        [JsonPropertyName("users")]
+        public virtual ICollection<User> Users { get; set; }
 
         [JsonPropertyName("items")]
         public virtual ICollection<Item> Items { get; set; }
@@ -32,8 +32,9 @@ namespace H4H.Domain.Entities
         public Organization()
         {
             Addresses = new HashSet<Address>();
-            Volunteers = new HashSet<Volunteer>();
+          
             Items = new HashSet<Item>();
+            Users = new HashSet<User>();    
         }
     }
 

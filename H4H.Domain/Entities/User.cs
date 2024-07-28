@@ -45,10 +45,19 @@ public class User : BaseEntity
     [JsonPropertyName("orders")]
     [InverseProperty("User")]
     public virtual ICollection<Order> Orders { get; set; }
+    [JsonPropertyName("organizationId")]
+    public int OrganizationId { get; set; }
+    [JsonPropertyName("items")]
+    public virtual ICollection<Item> Items { get; set; }
+
+    [JsonPropertyName("organization")]
+    [ForeignKey("OrganizationId")]
+    public virtual Organization Organization { get; set; }
 
     public User()
     {
         Addresses = new HashSet<Address>();
         Orders = new HashSet<Order>();
+        Items = new HashSet<Item>();
     }
 }
