@@ -12,13 +12,13 @@ public class Volunteer : User
     [InverseProperty("Volunteers")]
     public virtual ICollection<Organization> Organizations { get; set; }
 
-    [JsonPropertyName("assignedItems")]
-    [InverseProperty("AssignedVolunteers")]
-    public virtual ICollection<Item> AssignedItems { get; set; }
+    //[JsonPropertyName("assignedItems")]
+    //[InverseProperty("AssignedVolunteers")]
+    //public virtual ICollection<Item> AssignedItems { get; set; }
 
     public Volunteer()
     {
         Organizations = new HashSet<Organization>();
-        AssignedItems = new HashSet<Item>();
+        //AssignedItems = new HashSet<Item>();
     }
 }

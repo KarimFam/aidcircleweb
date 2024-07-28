@@ -41,13 +41,13 @@ namespace H4H.Domain.Entities
         [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
 
-        [JsonPropertyName("assignedVolunteers")]
-        public virtual ICollection<Volunteer> AssignedVolunteers { get; set; }
+        //[JsonPropertyName("assignedVolunteers")]
+        //public virtual ICollection<Volunteer> AssignedVolunteers { get; set; }
 
-        public Item()
-        {
-            AssignedVolunteers = new HashSet<Volunteer>();
-        }
+        //public Item()
+        //{
+        //    AssignedVolunteers = new HashSet<Volunteer>();
+        //}
     }
 
 }

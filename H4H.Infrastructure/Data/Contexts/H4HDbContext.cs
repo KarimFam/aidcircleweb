@@ -64,14 +64,12 @@ namespace H4H.Infrastructure.Data.Contexts
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //// Many-to-Many relationships for Orders, Volunteers, and Organizations
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(o => o.Volunteers)
-            //    .WithMany(v => v.AssignedItems);
+            // Many-to-Many relationships for Orders, Volunteers, and Organizations
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Items);
 
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(o => o.Organizations)
-            //    .WithMany(o => o.Items);
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Organizations);
 
             // Additional configuration as needed
         }
