@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace H4H.Domain.Entities
 {
-    public class Order {
+    public class Order : BaseEntity
+    {
         [JsonPropertyName("userId")]
         public int UserId { get; set; }
 
