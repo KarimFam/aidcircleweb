@@ -11,5 +11,10 @@ namespace H4H.Domain.Interfaces
         Task AddAsync(Address entity);
         Task UpdateAsync(Address entity);
         Task DeleteAsync(Address entity);
+
+        Task<List<Address>> GetAddressesByUserIdAsync(int userId);
+        Task<List<Address>> GetAddressesByVolunteerIdAsync(int volunteerId);
+        Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId);
+        Task<List<Address>> GetAddressesByItemIdAsync(int itemId);
     }
 }

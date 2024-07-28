@@ -29,7 +29,10 @@ namespace H4H.Domain.Entities
         [Required, MaxLength(100)]
         public string Country { get; set; }
 
+        [JsonPropertyName("addressableId")]
         public int AddressableId { get; set; }
+
+        [JsonPropertyName("addressableType")]
         public string AddressableType { get; set; } // User, Volunteer, Organization, Item
     }
 }
