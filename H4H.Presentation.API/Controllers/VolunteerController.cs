@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _volunteerService.AddVolunteerAsync(volunteer);
-            return CreatedAtAction(nameof(GetVolunteerById), new { id = volunteer.Id }, volunteer);
+            return CreatedAtAction(nameof(GetVolunteerById), new { id = volunteer.VolunteerId }, volunteer);
         }
 
         // PUT: api/volunteer/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVolunteer(int id, [FromBody] Volunteer volunteer)
+        public async Task<IActionResult> UpdateVolunteer(Guid id, [FromBody] Volunteer volunteer)
         {
-            if (volunteer == null || id != volunteer.Id)
+            if (volunteer == null || id != volunteer.VolunteerId)
             {
                 return BadRequest("Volunteer data is null or ID mismatch.");
             }

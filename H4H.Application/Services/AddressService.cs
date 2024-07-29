@@ -65,7 +65,7 @@ namespace H4H.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error occurred while updating address with ID {address.Id}");
+                _logger.LogError(ex, $"Error occurred while updating address with ID {address.AddressId}");
                 throw;
             }
         }

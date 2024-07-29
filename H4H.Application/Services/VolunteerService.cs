@@ -65,7 +65,7 @@ namespace H4H.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating volunteer with ID {volunteer.Id}");
+                _logger.LogError(ex, $"Error updating volunteer with ID {volunteer.VolunteerId}");
                 throw;
             }
         }

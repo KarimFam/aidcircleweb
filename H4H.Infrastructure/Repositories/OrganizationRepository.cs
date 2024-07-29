@@ -21,7 +21,7 @@ namespace H4H.Infrastructure.Repositories
         {
             return await _context.Organizations
                                  .Include(org => org.Addresses) // Include related entities as needed
-                                 .FirstOrDefaultAsync(org => org.Id == id);
+                                 .FirstOrDefaultAsync(org => org.OrganizationId == id);
         }
 
         public async Task<List<Organization>> GetAllAsync()

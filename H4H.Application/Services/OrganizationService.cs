@@ -65,7 +65,7 @@ namespace H4H.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating organization with ID {organization.Id}");
+                _logger.LogError(ex, $"Error updating organization with ID {organization.OrganizationId}");
                 throw;
             }
         }

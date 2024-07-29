@@ -31,7 +31,7 @@ namespace H4H.Application.Services
             }
         }
 
-        public async Task<User> GetUserByIdAsync(int id)
+        public async Task<User> GetUserByIdAsync(Guid id)
         {
             try
             {
@@ -65,12 +65,12 @@ namespace H4H.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating user with ID {user.Id}");
+                _logger.LogError(ex, $"Error updating user with ID {user.UserId}");
                 throw;
             }
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(Guid id)
         {
             try
             {

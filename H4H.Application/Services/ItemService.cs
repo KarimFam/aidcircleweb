@@ -65,7 +65,7 @@ namespace H4H.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error occurred while updating item with ID {item.Id}");
+                _logger.LogError(ex, $"Error occurred while updating item with ID {item.ItemId}");
                 throw;
             }
         }
