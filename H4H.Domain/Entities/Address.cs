@@ -28,6 +28,11 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("country")]
         [Required, MaxLength(100)]
         public string Country { get; set; }
+        public virtual Organization Organization { get; set; }
+        public virtual Item Item { get; set; }
+        public virtual Order Order { get; set; }
+        public virtual User User { get; set; }  
+        public virtual Volunteer Volunteer { get; set; }
 
        //JsonPropertyName("addressableId")] dont need this, not being used anywhere else in the code
      // public int AddressableId { get; set; }

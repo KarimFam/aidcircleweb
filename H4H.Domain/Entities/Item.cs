@@ -27,12 +27,12 @@ namespace H4H.Domain.Entities
   //    [Required, MaxLength(50)]
      // public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
 
-        [JsonPropertyName("addressId")]
-        public int AddressId { get; set; }
+       
 
-        [JsonPropertyName("address")]
-        [ForeignKey("AddressId")]
-        public virtual Address Address { get; set; }
+
+        [JsonPropertyName("addresses")]
+      
+        public virtual ICollection<Address> Addresses { get; set; }
 
 
 
@@ -57,6 +57,11 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("organization")]
         [ForeignKey("OrganizationId")]
         public virtual Organization Organization { get; set; }
+        public Item()
+        {
+            Addresses = new HashSet<Address>();
+        }
     }
+   
 
 }
