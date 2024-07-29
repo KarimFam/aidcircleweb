@@ -10,7 +10,7 @@ namespace H4H.Domain.Entities
         public Guid OrderId { get; set; }
 
         [JsonPropertyName("userId")]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
    
         [ForeignKey("UserId")]
         [JsonPropertyName("user")]
