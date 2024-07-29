@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _itemService.AddItemAsync(item);
-            return CreatedAtAction(nameof(GetItemById), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetItemById), new { id = item.ItemId }, item);
         }
 
         // PUT: api/item/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, [FromBody] Item item)
+        public async Task<IActionResult> UpdateItem(Guid id, [FromBody] Item item)
         {
-            if (item == null || id != item.Id)
+            if (item == null || id != item.ItemId)
             {
                 return BadRequest("Item is null or ID mismatch.");
             }

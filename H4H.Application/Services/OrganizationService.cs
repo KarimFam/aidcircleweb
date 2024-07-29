@@ -31,7 +31,7 @@ namespace H4H.Application.Services
             }
         }
 
-        public async Task<Organization> GetOrganizationByIdAsync(int id)
+        public async Task<Organization> GetOrganizationByIdAsync(Guid id)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace H4H.Application.Services
             }
         }
 
-        public async Task DeleteOrganizationAsync(int id)
+        public async Task DeleteOrganizationAsync(Guid id)
         {
             try
             {

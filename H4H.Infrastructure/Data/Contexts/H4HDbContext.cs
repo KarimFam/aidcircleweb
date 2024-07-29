@@ -33,25 +33,25 @@ namespace H4H.Infrastructure.Data.Contexts
             // Define relationships
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Addresses)
-                .WithOne(a => a.UserId)
+                .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Volunteer>()
-                .HasMany(v => v.Addresses)
-                .WithOne(a => a.VolunteerId)
-                .HasForeignKey(a => a.VolunteerId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<Volunteer>()
+            //    .HasMany(v => v.Addresses)
+            //    .WithOne(a => a.Volunteer)
+            //    .HasForeignKey(a => a.VolunteerId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Addresses)
-                .WithOne(a => a.OrganizationId)
+                .WithOne(a => a.Organization)
                 .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
                 .HasMany(i => i.Addresses)
-                .WithOne(a => a.ItemId)
+                .WithOne(a => a.Item)
                 .HasForeignKey(i => i.AddressId)
                 .OnDelete(DeleteBehavior.Cascade);
 

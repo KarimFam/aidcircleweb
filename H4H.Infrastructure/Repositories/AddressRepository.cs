@@ -71,18 +71,27 @@ namespace H4H.Infrastructure.Repositories
         //    return await _context.Addresses.Where(a => a.PostalCode == postalCode).ToListAsync();
         //}
 
-        public async Task<List<Address>> GetAddressbyUserIDAsync(Guid userId)
+        public async Task<List<Address>> GetAddressByUserIdAsync(Guid userId)
         {
             return await _context.Addresses.Where(a => a.AddressId == userId).ToListAsync();
         }
 
 
 
-        //public async Task<List<Address>> GetAddressesByVolunteerIdAsync(int volunteerId)
-        //{
-        //    return await _context.Addresses.Where(a => a.AddressableId == volunteerId && a.AddressableType == "Volunteer").ToListAsync();
-        //}
+        public async Task<List<Address>> GetAddressesByItemIdAsync(Guid itemId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == itemId).ToListAsync();
+        }
 
+        public async Task<List<Address>> GetAddressByOrderIdAsync(Guid orderId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == orderId).ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressByOrganizationIdAsync(Guid organizationId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == organizationId).ToListAsync();
+        }
         //public async Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId)
         //{
         //    return await _context.Addresses.Where(a => a.AddressableId == organizationId && a.AddressableType == "Organization").ToListAsync();

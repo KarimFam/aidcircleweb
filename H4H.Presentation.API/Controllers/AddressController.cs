@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _addressService.AddAddressAsync(address);
-            return CreatedAtAction(nameof(GetAddressById), new { id = address.Id }, address);
+            return CreatedAtAction(nameof(GetAddressById), new { id = address.AddressId }, address);
         }
 
         // PUT: api/address/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAddress(int id, [FromBody] Address address)
+        public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] Address address)
         {
-            if (address == null || id != address.Id)
+            if (address == null || id != address.AddressId)
             {
                 return BadRequest("Address is null or ID mismatch.");
             }

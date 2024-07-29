@@ -26,7 +26,7 @@ namespace H4H.Presentation.API.Controllers
 
         // GET: api/organization/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrganizationById(int id)
+        public async Task<IActionResult> GetOrganizationById(Guid id)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(id);
             if (organization == null)
@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _organizationService.AddOrganizationAsync(organization);
-            return CreatedAtAction(nameof(GetOrganizationById), new { id = organization.Id }, organization);
+            return CreatedAtAction(nameof(GetOrganizationById), new { id = organization.OrganizationId }, organization);
         }
 
         // PUT: api/organization/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrganization(int id, [FromBody] Organization organization)
+        public async Task<IActionResult> UpdateOrganization(Guid id, [FromBody] Organization organization)
         {
-            if (organization == null || id != organization.Id)
+            if (organization == null || id != organization.OrganizationId)
             {
                 return BadRequest("Organization data is null or ID mismatch.");
             }
@@ -64,7 +64,7 @@ namespace H4H.Presentation.API.Controllers
 
         // DELETE: api/organization/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrganization(int id)
+        public async Task<IActionResult> DeleteOrganization(Guid id)
         {
             var organization = await _organizationService.GetOrganizationByIdAsync(id);
             if (organization == null)
