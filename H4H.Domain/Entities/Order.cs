@@ -6,6 +6,9 @@ namespace H4H.Domain.Entities
 {
     public class Order : BaseEntity
     {
+        [JsonPropertyName("orderId")]
+        public Guid OrderId { get; set; }
+
         [JsonPropertyName("userId")]
         public int UserId { get; set; }
    

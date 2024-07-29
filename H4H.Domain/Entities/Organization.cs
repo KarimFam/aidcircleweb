@@ -13,6 +13,9 @@ namespace H4H.Domain.Entities
 {
     public class Organization : BaseEntity
     {
+        [JsonPropertyName("organizationId")]
+        public Guid OrganizationId { get; set; }
+
         [JsonPropertyName("name")]
         public string Name { get; set; }
 

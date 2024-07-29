@@ -5,6 +5,9 @@ namespace H4H.Domain.Entities
 {
     public class Address : BaseEntity
     {
+        [JsonPropertyName("addressId")]
+        public Guid AddressId { get; set; }
+
         [JsonPropertyName("line1")]
         [Required, MaxLength(255)]
         public string Line1 { get; set; }
@@ -28,11 +31,11 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("country")]
         [Required, MaxLength(100)]
         public string Country { get; set; }
-        public virtual Organization Organization { get; set; }
-        public virtual Item Item { get; set; }
-        public virtual Order Order { get; set; }
-        public virtual User User { get; set; }  
-        public virtual Volunteer Volunteer { get; set; }
+        public virtual Organization OrganizationId { get; set; }
+        public virtual Item ItemId { get; set; }
+        public virtual Order OrderId { get; set; }
+        public virtual User UserId { get; set; }  
+        public virtual Volunteer VolunteerId { get; set; }
 
        //JsonPropertyName("addressableId")] dont need this, not being used anywhere else in the code
      // public int AddressableId { get; set; }

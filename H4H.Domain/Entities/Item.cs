@@ -12,6 +12,9 @@ namespace H4H.Domain.Entities
 {
     public class Item : BaseEntity
     {
+        [JsonPropertyName("itemId")]
+        public Guid ItemId { get; set; }
+
         [JsonPropertyName("name")]
         [Required, MaxLength(100)]
         public string Name { get; set; }
@@ -27,10 +30,7 @@ namespace H4H.Domain.Entities
   //    [Required, MaxLength(50)]
      // public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
 
-       
-
-
-        [JsonPropertyName("addresses")]
+       [JsonPropertyName("addresses")]
       
         public virtual ICollection<Address> Addresses { get; set; }
 
@@ -53,6 +53,8 @@ namespace H4H.Domain.Entities
 
         [JsonPropertyName("organizationId")]
         public int OrganizationId { get; set; }
+        
+        public int AddressId { get; set; }
 
         [JsonPropertyName("organization")]
         [ForeignKey("OrganizationId")]

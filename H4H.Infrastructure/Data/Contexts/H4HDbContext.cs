@@ -26,29 +26,32 @@ namespace H4H.Infrastructure.Data.Contexts
             base.OnModelCreating(modelBuilder);
 
             // Configure polymorphic relationship for Item creation (User, Volunteer, Organization)
-            modelBuilder.Entity<Item>()
-                .Property(i => i.CreatedByType)
-                .HasConversion<string>();
+            //modelBuilder.Entity<Item>()
+            //    .Property(i => i.CreatedByType)
+            //    .HasConversion<string>();
 
             // Define relationships
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Addresses)
-                .WithOne()
+                .WithOne(a => a.UserId)
+                .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Volunteer>()
                 .HasMany(v => v.Addresses)
-                .WithOne()
+                .WithOne(a => a.VolunteerId)
+                .HasForeignKey(a => a.VolunteerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Addresses)
-                .WithOne()
+                .WithOne(a => a.OrganizationId)
+                .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
-                .HasOne(i => i.Address)
-                .WithMany()
+                .HasMany(i => i.Addresses)
+                .WithOne(a => a.ItemId)
                 .HasForeignKey(i => i.AddressId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -66,10 +69,13 @@ namespace H4H.Infrastructure.Data.Contexts
 
             // Many-to-Many relationships for Orders, Volunteers, and Organizations
             modelBuilder.Entity<Order>()
-                .HasMany(o => o.Items);
+                .HasMany(o => o.Items)
+                .WithOne(i => i.Order)
+                .HasForeignKey(i => i.OrderId);
 
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.Organizations);
+            //modelBuilder.Entity<Order>()
+            //    .HasMany(o => o.Organizations)
+            //    .WithMany(o => o.Orders);
 
             // Additional configuration as needed
         }

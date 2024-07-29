@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 public class User : BaseEntity
 {
+    [JsonPropertyName("userId")]
+    public Guid UserId { get; set; }
+
     [JsonPropertyName("username")]
     [Required, MaxLength(50)]
     public string Username { get; set; }
