@@ -37,7 +37,7 @@ namespace H4H.Domain.Entities
 
 
         [JsonPropertyName("orderId")]
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
 
 
         [JsonPropertyName("order")]
@@ -52,7 +52,7 @@ namespace H4H.Domain.Entities
         public virtual User User { get; set; }
 
         [JsonPropertyName("organizationId")]
-        public int OrganizationId { get; set; }
+        public int? OrganizationId { get; set; }
         
         public int AddressId { get; set; }
 

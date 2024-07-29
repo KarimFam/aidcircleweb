@@ -49,7 +49,7 @@ public class User : BaseEntity
     [InverseProperty("User")]
     public virtual ICollection<Order> Orders { get; set; }
     [JsonPropertyName("organizationId")]
-    public int OrganizationId { get; set; }
+    public int? OrganizationId { get; set; }
     [JsonPropertyName("items")]
     public virtual ICollection<Item> Items { get; set; }
 
