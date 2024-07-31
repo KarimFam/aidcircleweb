@@ -37,14 +37,14 @@ namespace H4H.Infrastructure.Data.Contexts
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //modelBuilder.Entity<Volunteer>()
-            //    .HasMany(v => v.Addresses)
-            //    .WithOne(a => a.Volunteer)
-            //    .HasForeignKey(a => a.VolunteerId)
-            //    .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Addresses)
+                .WithOne(a => a.Organization)
+                .HasForeignKey(a => a.OrganizationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Organization>()
+                .HasMany(i => i.Items)
                 .WithOne(a => a.Organization)
                 .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -67,7 +67,15 @@ namespace H4H.Infrastructure.Data.Contexts
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Many-to-Many relationships for Orders, Volunteers, and Organizations
+
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.User)
+                .WithMany(o => o.Items)
+                .HasForeignKey(i => i.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+          
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.Items)
                 .WithOne(i => i.Order)
@@ -76,6 +84,29 @@ namespace H4H.Infrastructure.Data.Contexts
             //modelBuilder.Entity<Order>()
             //    .HasMany(o => o.Organizations)
             //    .WithMany(o => o.Orders);
+            modelBuilder.Entity<Volunteer>()
+            .HasMany(v => v.Orders)
+            .WithMany(o => o.Volunteers)
+            .UsingEntity<Dictionary<string, object>>(
+                "VolunteerOrder",
+                j => j
+                    .HasOne<Order>()
+                    .WithMany()
+                    .HasForeignKey("OrderId")
+                    .HasConstraintName("FK_VolunteerOrder_Orders_OrderId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<Volunteer>()
+                    .WithMany()
+                    .HasForeignKey("VolunteerId")
+                    .HasConstraintName("FK_VolunteerOrder_Volunteers_VolunteerId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.Property<Guid>("VolunteerId").HasColumnName("VolunteerForeignKey");
+                    j.Property<Guid>("OrderId").HasColumnName("OrderForeignKey");
+                    j.HasKey("VolunteerId", "OrderId");
+                });
 
             // Additional configuration as needed
         }

@@ -37,28 +37,28 @@ namespace H4H.Domain.Entities
 
 
         [JsonPropertyName("orderId")]
-        public int? OrderId { get; set; }
+        public Guid? OrderId { get; set; }
 
 
         [JsonPropertyName("order")]
         [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
+        public virtual Order? Order { get; set; }
 
         [JsonPropertyName("userId")]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [JsonPropertyName("user")]
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
 
         [JsonPropertyName("organizationId")]
-        public int? OrganizationId { get; set; }
+        public Guid? OrganizationId { get; set; }
         
-        public int AddressId { get; set; }
+        public Guid AddressId { get; set; }
 
         [JsonPropertyName("organization")]
         [ForeignKey("OrganizationId")]
-        public virtual Organization Organization { get; set; }
+        public virtual Organization? Organization { get; set; }
         public Item()
         {
             Addresses = new HashSet<Address>();

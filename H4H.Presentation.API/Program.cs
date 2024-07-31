@@ -19,6 +19,8 @@ builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
