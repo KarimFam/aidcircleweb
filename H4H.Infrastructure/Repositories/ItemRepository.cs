@@ -21,9 +21,9 @@ namespace H4H.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Item> GetByIdAsync(Guid itemid)
+        public async Task<Item> GetByIdAsync(Guid ItemId)
         {
-            return await _context.Items.FindAsync(itemid);
+            return await _context.Items.FindAsync(ItemId);
         }
 
         public async Task<List<Item>> GetAllAsync()

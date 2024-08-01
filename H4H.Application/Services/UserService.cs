@@ -21,9 +21,9 @@ namespace H4H.Application.Services
             return await _userRepository.GetAllAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(Guid userId)
+        public async Task<User> GetUserByIdAsync(Guid UserId)
         {
-            return await _userRepository.GetByIdAsync(userId);
+            return await _userRepository.GetByIdAsync(UserId);
         }
 
         public async Task AddUserAsync(User user)
@@ -36,9 +36,9 @@ namespace H4H.Application.Services
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task DeleteUserAsync(Guid userId)
+        public async Task DeleteUserAsync(Guid UserId)
         {
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(UserId);
             if (user != null)
             {
                 await _userRepository.DeleteAsync(user);

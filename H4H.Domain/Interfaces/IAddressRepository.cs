@@ -6,7 +6,7 @@ namespace H4H.Domain.Interfaces
 {
     public interface IAddressRepository
     {
-        Task<Address> GetByIdAsync(Guid addressId);
+        Task<Address> GetByIdAsync(Guid AddressId);
         Task<List<Address>> GetAllAsync();
         Task AddAsync(Address entity);
         Task UpdateAsync(Address entity);

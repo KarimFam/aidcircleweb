@@ -21,9 +21,9 @@ namespace H4H.Application.Services
             return await _itemRepository.GetAllAsync();
         }
 
-        public async Task<Item> GetItemByIdAsync(Guid itemId) // Change to Guid to match ItemId type
+        public async Task<Item> GetItemByIdAsync(Guid ItemId) // Change to Guid to match ItemId type
         {
-            return await _itemRepository.GetByIdAsync(itemId);
+            return await _itemRepository.GetByIdAsync(ItemId);
         }
 
         public async Task AddItemAsync(Item item)
@@ -36,9 +36,9 @@ namespace H4H.Application.Services
             await _itemRepository.UpdateAsync(item);
         }
 
-        public async Task DeleteItemAsync(Guid itemId) // Change to Guid to match ItemId type
+        public async Task DeleteItemAsync(Guid ItemId) // Change to Guid to match ItemId type
         {
-            var item = await _itemRepository.GetByIdAsync(itemId);
+            var item = await _itemRepository.GetByIdAsync(ItemId);
             if (item != null)
             {
                 await _itemRepository.DeleteAsync(item);

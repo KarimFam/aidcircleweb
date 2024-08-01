@@ -14,14 +14,14 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
-    public async Task<Order> GetOrderByIdAsync(Guid id)
+    public async Task<Order> GetOrderByIdAsync(Guid OrderId)
     {
         return await _context.Orders
             .Include(o => o.Users)
             .Include(o => o.Items)
            // .Include(o => o.Volunteers)
             .Include(o => o.Addresses)
-            .FirstOrDefaultAsync(o => o.OrderId == id);
+            .FirstOrDefaultAsync(o => o.OrderId == OrderId);
     }
 
     public async Task<List<Order>> GetAllOrdersAsync()

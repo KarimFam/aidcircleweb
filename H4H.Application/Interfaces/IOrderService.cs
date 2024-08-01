@@ -8,9 +8,9 @@ namespace H4H.Application.Interfaces
     public interface IOrderService
     {
         Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task<Order> GetOrderByIdAsync(Guid orderId);
+        Task<Order> GetOrderByIdAsync(Guid OrderId);
         Task AddOrderAsync(Order order);
         Task UpdateOrderAsync(Order order);
-        Task DeleteOrderAsync(Guid orderId);
+        Task DeleteOrderAsync(Guid OrderId);
     }
 }

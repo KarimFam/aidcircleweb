@@ -21,9 +21,9 @@ namespace H4H.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Address> GetByIdAsync(Guid addressId)
+        public async Task<Address> GetByIdAsync(Guid AddressId)
         {
-            return await _context.Addresses.FindAsync(addressId);
+            return await _context.Addresses.FindAsync(AddressId);
         }
 
         public async Task<List<Address>> GetAllAsync()
@@ -71,26 +71,26 @@ namespace H4H.Infrastructure.Repositories
         //    return await _context.Addresses.Where(a => a.PostalCode == postalCode).ToListAsync();
         //}
 
-        public async Task<List<Address>> GetAddressByUserIdAsync(Guid userId)
+        public async Task<List<Address>> GetAddressByUserIdAsync(Guid UserId)
         {
-            return await _context.Addresses.Where(a => a.AddressId == userId).ToListAsync();
+            return await _context.Addresses.Where(a => a.AddressId == UserId).ToListAsync();
         }
 
 
 
-        public async Task<List<Address>> GetAddressesByItemIdAsync(Guid itemId)
+        public async Task<List<Address>> GetAddressesByItemIdAsync(Guid ItemId)
         {
-            return await _context.Addresses.Where(a => a.AddressId == itemId).ToListAsync();
+            return await _context.Addresses.Where(a => a.AddressId == ItemId).ToListAsync();
         }
 
-        public async Task<List<Address>> GetAddressByOrderIdAsync(Guid orderId)
+        public async Task<List<Address>> GetAddressByOrderIdAsync(Guid OrderId)
         {
-            return await _context.Addresses.Where(a => a.AddressId == orderId).ToListAsync();
+            return await _context.Addresses.Where(a => a.AddressId == OrderId).ToListAsync();
         }
 
-        public async Task<List<Address>> GetAddressByOrganizationIdAsync(Guid organizationId)
+        public async Task<List<Address>> GetAddressByOrganizationIdAsync(Guid OrganizationId)
         {
-            return await _context.Addresses.Where(a => a.AddressId == organizationId).ToListAsync();
+            return await _context.Addresses.Where(a => a.AddressId == OrganizationId).ToListAsync();
         }
         //public async Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId)
         //{

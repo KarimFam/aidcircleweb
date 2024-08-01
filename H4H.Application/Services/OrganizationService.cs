@@ -21,9 +21,9 @@ namespace H4H.Application.Services
             return await _organizationRepository.GetAllAsync();
         }
 
-        public async Task<Organization> GetOrganizationByIdAsync(Guid organizationId)
+        public async Task<Organization> GetOrganizationByIdAsync(Guid OrganizationId)
         {
-            return await _organizationRepository.GetByIdAsync(organizationId);
+            return await _organizationRepository.GetByIdAsync(OrganizationId);
         }
 
         public async Task AddOrganizationAsync(Organization organization)
@@ -36,9 +36,9 @@ namespace H4H.Application.Services
             await _organizationRepository.UpdateAsync(organization);
         }
 
-        public async Task DeleteOrganizationAsync(Guid organizationId)
+        public async Task DeleteOrganizationAsync(Guid OrganizationId)
         {
-            var organization = await _organizationRepository.GetByIdAsync(organizationId);
+            var organization = await _organizationRepository.GetByIdAsync(OrganizationId);
             if (organization != null)
             {
                 await _organizationRepository.DeleteAsync(organization);

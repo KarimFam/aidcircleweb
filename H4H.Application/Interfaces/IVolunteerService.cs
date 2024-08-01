@@ -7,9 +7,9 @@ namespace H4H.Application.Interfaces
     public interface IVolunteerService
     {
         Task<IEnumerable<Volunteer>> GetAllVolunteersAsync();
-        Task<Volunteer> GetVolunteerByIdAsync(Guid volunteerId); // Change to Guid to match VolunteerId type
+        Task<Volunteer> GetVolunteerByIdAsync(Guid VolunteerId); // Change to Guid to match VolunteerId type
         Task AddVolunteerAsync(Volunteer volunteer);
         Task UpdateVolunteerAsync(Volunteer volunteer);
-        Task DeleteVolunteerAsync(Guid volunteerId); // Change to Guid to match VolunteerId type
+        Task DeleteVolunteerAsync(Guid VolunteerId); // Change to Guid to match VolunteerId type
     }
 }

@@ -7,9 +7,9 @@ namespace H4H.Application.Interfaces
     public interface IUserService
     {
         Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<User> GetUserByIdAsync(Guid userId);
+        Task<User> GetUserByIdAsync(Guid UserId);
         Task AddUserAsync(User user);
         Task UpdateUserAsync(User user);
-        Task DeleteUserAsync(Guid userId);
+        Task DeleteUserAsync(Guid UserId);
     }
 }

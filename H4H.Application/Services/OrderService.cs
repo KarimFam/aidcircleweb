@@ -21,9 +21,9 @@ namespace H4H.Application.Services
             return await _orderRepository.GetAllOrdersAsync();
         }
 
-        public async Task<Order> GetOrderByIdAsync(Guid orderId)
+        public async Task<Order> GetOrderByIdAsync(Guid OrderId)
         {
-            return await _orderRepository.GetOrderByIdAsync(orderId);
+            return await _orderRepository.GetOrderByIdAsync(OrderId);
         }
 
         public async Task AddOrderAsync(Order order)
@@ -36,9 +36,9 @@ namespace H4H.Application.Services
             await _orderRepository.UpdateOrderAsync(order);
         }
 
-        public async Task DeleteOrderAsync(Guid orderId)
+        public async Task DeleteOrderAsync(Guid OrderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await _orderRepository.GetOrderByIdAsync(OrderId);
             if (order != null)
             {
                 await _orderRepository.DeleteOrderAsync(order);

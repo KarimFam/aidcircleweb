@@ -7,15 +7,15 @@ namespace H4H.Application.Interfaces
     public interface IAddressService
     {
         Task<IEnumerable<Address>> GetAllAddressesAsync();
-        Task<Address> GetAddressByIdAsync(Guid addressId); // Change to Guid to match AddressId type
+        Task<Address> GetAddressByIdAsync(Guid AddressId); // Change to Guid to match AddressId type
         Task AddAddressAsync(Address address);
         Task UpdateAddressAsync(Address address);
-        Task DeleteAddressAsync(Guid addressId); // Change to Guid to match AddressId type
+        Task DeleteAddressAsync(Guid AddressId); // Change to Guid to match AddressId type
 
         // Additional methods specific to Address operations
-        Task<IEnumerable<Address>> GetAddressesByUserIdAsync(Guid userId);
-        Task<IEnumerable<Address>> GetAddressesByOrganizationIdAsync(Guid organizationId);
-        Task<IEnumerable<Address>> GetAddressesByItemIdAsync(Guid itemId);
-        Task<IEnumerable<Address>> GetAddressesByOrderIdAsync(Guid orderId);
+        Task<IEnumerable<Address>> GetAddressesByUserIdAsync(Guid UserId);
+        Task<IEnumerable<Address>> GetAddressesByOrganizationIdAsync(Guid OrganizationId);
+        Task<IEnumerable<Address>> GetAddressesByItemIdAsync(Guid ItemId);
+        Task<IEnumerable<Address>> GetAddressesByOrderIdAsync(Guid OrderId);
     }
 }

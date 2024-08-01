@@ -21,9 +21,9 @@ namespace H4H.Application.Services
             return await _volunteerRepository.GetAllAsync();
         }
 
-        public async Task<Volunteer> GetVolunteerByIdAsync(Guid volunteerId) // Change to Guid to match VolunteerId type
+        public async Task<Volunteer> GetVolunteerByIdAsync(Guid VolunteerId) // Change to Guid to match VolunteerId type
         {
-            return await _volunteerRepository.GetByIdAsync(volunteerId);
+            return await _volunteerRepository.GetByIdAsync(VolunteerId);
         }
 
         public async Task AddVolunteerAsync(Volunteer volunteer)
@@ -36,9 +36,9 @@ namespace H4H.Application.Services
             await _volunteerRepository.UpdateAsync(volunteer);
         }
 
-        public async Task DeleteVolunteerAsync(Guid volunteerId) // Change to Guid to match VolunteerId type
+        public async Task DeleteVolunteerAsync(Guid VolunteerId) // Change to Guid to match VolunteerId type
         {
-            var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId);
+            var volunteer = await _volunteerRepository.GetByIdAsync(VolunteerId);
             if (volunteer != null)
             {
                 await _volunteerRepository.DeleteAsync(volunteer);
