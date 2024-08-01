@@ -10,9 +10,9 @@ public class Volunteer : User
 
     [JsonPropertyName("skills")]
     public string Skills { get; set; }
-    public virtual ICollection<Order> Order { get; set; }
-    public Volunteer() { 
-        Orders = new HashSet<Order>();
+  //  public virtual ICollection<Order> Order { get; set; }
+    public Volunteer(): base(){
+   // Orders = new HashSet<Order>();  
     }
 
    // [JsonPropertyName("organizations")]

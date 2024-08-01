@@ -41,23 +41,25 @@ namespace H4H.Domain.Entities
 
 
         [JsonPropertyName("order")]
-        [ForeignKey("OrderId")]
+     //   [ForeignKey("OrderId")]
         public virtual Order? Order { get; set; }
 
         [JsonPropertyName("userId")]
-        public Guid UserId { get; set; }
+      
 
-        [JsonPropertyName("user")]
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        //[JsonPropertyName("user")]
+    //    [ForeignKey("UserId")]
+    public Guid? UserId { get; set; }
+        public virtual ICollection<User> Users { get; set; }
 
         [JsonPropertyName("organizationId")]
         public Guid? OrganizationId { get; set; }
         
-        public Guid AddressId { get; set; }
+        public Guid? AddressId { get; set; }
 
-        [JsonPropertyName("organization")]
-        [ForeignKey("OrganizationId")]
+      //  [JsonPropertyName("organization")]
+       // [ForeignKey("OrganizationId")]
+
         public virtual Organization? Organization { get; set; }
         public Item()
         {

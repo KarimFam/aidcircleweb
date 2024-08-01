@@ -14,39 +14,39 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
-    public async Task<Order> GetByIdAsync(Guid id)
+    public async Task<Order> GetOrderByIdAsync(Guid id)
     {
         return await _context.Orders
-            .Include(o => o.User)
+            .Include(o => o.Users)
             .Include(o => o.Items)
-            .Include(o => o.Volunteers)
+           // .Include(o => o.Volunteers)
             .Include(o => o.Addresses)
             .FirstOrDefaultAsync(o => o.OrderId == id);
     }
 
-    public async Task<List<Order>> GetAllAsync()
+    public async Task<List<Order>> GetAllOrdersAsync()
     {
         return await _context.Orders
-            .Include(o => o.User)
+            .Include(o => o.Users)
             .Include(o => o.Items)
-            .Include(o => o.Volunteers)
+           // .Include(o => o.Volunteers)
             .Include(o => o.Addresses)
             .ToListAsync();
     }
 
-    public async Task AddAsync(Order order)
+    public async Task AddOrderAsync(Order order)
     {
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Order order)
+    public async Task UpdateOrderAsync(Order order)
     {
         _context.Orders.Update(order);
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Order order)
+    public async Task DeleteOrderAsync(Order order)
     {
         _context.Orders.Remove(order);
         await _context.SaveChangesAsync();

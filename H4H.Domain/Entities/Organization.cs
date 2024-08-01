@@ -24,12 +24,17 @@ namespace H4H.Domain.Entities
 
         // Relationships
         [JsonPropertyName("addresses")]
+        public Guid? AddressId { get; set; }
         public virtual ICollection<Address> Addresses { get; set; }
 
         [JsonPropertyName("users")]
+        public Guid? UserId { get; set; }
+
         public virtual ICollection<User> Users { get; set; }
 
         [JsonPropertyName("items")]
+        public Guid? ItemId { get; set; }
+
         public virtual ICollection<Item> Items { get; set; }
 
         public Organization()
