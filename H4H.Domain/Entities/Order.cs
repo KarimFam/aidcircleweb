@@ -22,8 +22,6 @@ namespace H4H.Domain.Entities
         [InverseProperty("Order")]
         public virtual ICollection<Item> Items { get; set; }
 
-        // EF Core does not directly support many-to-many without a joining entity
-        // Consider defining a join entity or table configuration in OnModelCreating
 
 
         //   [JsonPropertyName("volunteers")]

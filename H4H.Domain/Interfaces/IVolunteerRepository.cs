@@ -6,7 +6,7 @@ namespace H4H.Domain.Interfaces
 {
     public interface IVolunteerRepository
     {
-        Task<Volunteer> GetByIdAsync(int id);
+        Task<Volunteer> GetByIdAsync(Guid volunteerId);
         Task<List<Volunteer>> GetAllAsync();
         Task AddAsync(Volunteer entity);
         Task UpdateAsync(Volunteer entity);

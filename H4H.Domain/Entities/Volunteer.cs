@@ -15,17 +15,5 @@ public class Volunteer : User
    // Orders = new HashSet<Order>();  
     }
 
-   // [JsonPropertyName("organizations")]
-   // [InverseProperty("Volunteers")]
-    //public virtual ICollection<Organization> Organizations { get; set; }
 
-    //[JsonPropertyName("assignedItems")]
-    //[InverseProperty("AssignedVolunteers")]
-    //public virtual ICollection<Item> AssignedItems { get; set; }
-
-    //public Volunteer()
-    //{
-    //    Organizations = new HashSet<Organization>();
-    //    //AssignedItems = new HashSet<Item>();
-    //}
 }

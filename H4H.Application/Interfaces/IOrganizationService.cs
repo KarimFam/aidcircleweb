@@ -7,10 +7,10 @@ namespace H4H.Application.Interfaces
     public interface IOrganizationService
     {
         Task<IEnumerable<Organization>> GetAllOrganizationsAsync();
-        Task<Organization> GetOrganizationByIdAsync(Guid id);
+        Task<Organization> GetOrganizationByIdAsync(Guid organizationId);
         Task AddOrganizationAsync(Organization organization);
         Task UpdateOrganizationAsync(Organization organization);
-        Task DeleteOrganizationAsync(Guid id);
+        Task DeleteOrganizationAsync(Guid organizationId);
     }
 }
 

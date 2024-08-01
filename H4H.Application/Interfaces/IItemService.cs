@@ -7,10 +7,9 @@ namespace H4H.Application.Interfaces
     public interface IItemService
     {
         Task<IEnumerable<Item>> GetAllItemsAsync();
-        Task<Item> GetItemByIdAsync(int id);
+        Task<Item> GetItemByIdAsync(Guid itemId); // Change to Guid to match ItemId type
         Task AddItemAsync(Item item);
         Task UpdateItemAsync(Item item);
-        Task DeleteItemAsync(int id);
-        // Additional methods specific to Item operations can be added here
+        Task DeleteItemAsync(Guid itemId); // Change to Guid to match ItemId type
     }
 }
