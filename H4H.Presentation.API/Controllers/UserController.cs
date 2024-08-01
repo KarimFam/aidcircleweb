@@ -30,7 +30,7 @@ namespace H4H.Presentation.API.Controllers
 
         // GET: api/user/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
@@ -52,14 +52,14 @@ namespace H4H.Presentation.API.Controllers
             // Add additional validation here if needed
 
             await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
         }
 
         // PUT: api/user/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] User user)
         {
-            if (user == null || id != user.Id)
+            if (user == null || id != user.UserId)
             {
                 return BadRequest("User is null or ID mismatch.");
             }
@@ -72,7 +72,7 @@ namespace H4H.Presentation.API.Controllers
 
         // DELETE: api/user/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)

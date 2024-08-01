@@ -12,6 +12,9 @@ namespace H4H.Domain.Entities
 {
     public class Item : BaseEntity
     {
+        [JsonPropertyName("itemId")]
+        public Guid ItemId { get; set; }
+
         [JsonPropertyName("name")]
         [Required, MaxLength(100)]
         public string Name { get; set; }
@@ -20,34 +23,49 @@ namespace H4H.Domain.Entities
         [MaxLength(1000)]
         public string Description { get; set; }
 
-        [JsonPropertyName("createdById")]
-        public int CreatedById { get; set; }
+        //[JsonPropertyName("createdById")]
+        //public int CreatedById { get; set; }
 
-        [JsonPropertyName("createdByType")]
-        [Required, MaxLength(50)]
-        public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
+  //    [JsonPropertyName("createdByType")]
+  //    [Required, MaxLength(50)]
+     // public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
 
-        [JsonPropertyName("addressId")]
-        public int AddressId { get; set; }
+       [JsonPropertyName("addresses")]
+      
+        public virtual ICollection<Address> Addresses { get; set; }
 
-        [JsonPropertyName("address")]
-        [ForeignKey("AddressId")]
-        public virtual Address Address { get; set; }
+
 
         [JsonPropertyName("orderId")]
-        public int? OrderId { get; set; }
+        public Guid? OrderId { get; set; }
+
 
         [JsonPropertyName("order")]
-        [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
+     //   [ForeignKey("OrderId")]
+        public virtual Order? Order { get; set; }
 
-        //[JsonPropertyName("assignedVolunteers")]
-        //public virtual ICollection<Volunteer> AssignedVolunteers { get; set; }
+        [JsonPropertyName("userId")]
+      
 
-        //public Item()
-        //{
-        //    AssignedVolunteers = new HashSet<Volunteer>();
-        //}
+        //[JsonPropertyName("user")]
+    //    [ForeignKey("UserId")]
+    public Guid? UserId { get; set; }
+        public virtual ICollection<User> Users { get; set; }
+
+        [JsonPropertyName("organizationId")]
+        public Guid? OrganizationId { get; set; }
+        
+        public Guid? AddressId { get; set; }
+
+      //  [JsonPropertyName("organization")]
+       // [ForeignKey("OrganizationId")]
+
+        public virtual Organization? Organization { get; set; }
+        public Item()
+        {
+            Addresses = new HashSet<Address>();
+        }
     }
+   
 
 }

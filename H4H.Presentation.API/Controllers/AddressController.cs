@@ -26,12 +26,12 @@ namespace H4H.Presentation.API.Controllers
 
         // GET: api/address/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAddressById(int id)
+        public async Task<IActionResult> GetAddressById(Guid addressId)
         {
-            var address = await _addressService.GetAddressByIdAsync(id);
+            var address = await _addressService.GetAddressByIdAsync(addressId);
             if (address == null)
             {
-                return NotFound($"Address with ID {id} not found.");
+                return NotFound($"Address with ID {addressId} not found.");
             }
             return Ok(address);
         }
@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _addressService.AddAddressAsync(address);
-            return CreatedAtAction(nameof(GetAddressById), new { id = address.Id }, address);
+            return CreatedAtAction(nameof(GetAddressById), new { id = address.AddressId }, address);
         }
 
         // PUT: api/address/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAddress(int id, [FromBody] Address address)
+        public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] Address address)
         {
-            if (address == null || id != address.Id)
+            if (address == null || id != address.AddressId)
             {
                 return BadRequest("Address is null or ID mismatch.");
             }
@@ -64,9 +64,9 @@ namespace H4H.Presentation.API.Controllers
 
         // DELETE: api/address/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAddress(int id)
+        public async Task<IActionResult> DeleteAddress(Guid addressId)
         {
-            await _addressService.DeleteAddressAsync(id);
+            await _addressService.DeleteAddressAsync(addressId);
             return NoContent();
         }
     }

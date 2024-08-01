@@ -23,55 +23,74 @@ namespace H4H.Infrastructure.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Ignore Volunteers property in Order
+          
+
             base.OnModelCreating(modelBuilder);
 
             // Configure polymorphic relationship for Item creation (User, Volunteer, Organization)
-            modelBuilder.Entity<Item>()
-                .Property(i => i.CreatedByType)
-                .HasConversion<string>();
+            //modelBuilder.Entity<Item>()
+            //    .Property(i => i.CreatedByType)
+            //    .HasConversion<string>();
 
             // Define relationships
+            // Configure the TPH inheritance
+            //modelBuilder.Entity<User>()
+            //    .HasDiscriminator<string>("user_type")
+            //    .HasValue<User>("user_base")
+            //    .HasValue<Volunteer>("user_volunteer");
+
+            //modelBuilder.Entity<User>()
+            //    .Property("user_type")
+            //    .HasMaxLength(200);
+
+            //modelBuilder.Entity<Volunteer>()
+            //    .Property(v => v.VolunteerId)
+            //    .IsRequired();
+
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Addresses)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Volunteer>()
-                .HasMany(v => v.Addresses)
-                .WithOne()
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Organization>()
                 .HasMany(o => o.Addresses)
-                .WithOne()
+                .WithOne(a => a.Organization)
+                .HasForeignKey(a => a.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Organization>()
+            //     .HasMany(i => i.Items)
+            //    .WithOne(a => a.Organization)
+            //    .HasForeignKey(a => a.OrganizationId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
-                .HasOne(i => i.Address)
-                .WithMany()
-                .HasForeignKey(i => i.AddressId)
+                .HasMany(i => i.Addresses)
+                .WithOne(a => a.Item)
+                .HasForeignKey(i => i.ItemId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Item>()
-                .HasOne(i => i.Order)
-                .WithMany(o => o.Items)
-                .HasForeignKey(i => i.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<User>()
+            //    .HasMany(u => u.Orders)
+            //    .WithOne(o => o.User)
+            //    .HasForeignKey(o => o.UserId)
+            //    .OnDelete(DeleteBehavior.);
+
+           // modelBuilder.Entity<User>()
+           //.HasMany(u => u.Items)
+           //.WithMany(i => i.Users);
 
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.User)
-                .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasMany(o => o.Items)
+                .WithOne(i => i.Order)
+                .HasForeignKey(i => i.OrderId);
 
-            // Many-to-Many relationships for Orders, Volunteers, and Organizations
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.Items);
-
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.Organizations);
-
-            // Additional configuration as needed
+            // Define many-to-many relationship between Volunteer and Order
+            //modelBuilder.Entity<Volunteer>()
+            //    .HasMany(v => v.Orders)
+            //    .WithMany(o => o.Volunteers);
         }
     }
 }

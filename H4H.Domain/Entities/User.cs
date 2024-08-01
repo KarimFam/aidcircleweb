@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 
 public class User : BaseEntity
 {
+    [JsonPropertyName("userId")]
+    public Guid UserId { get; set; }
+
     [JsonPropertyName("username")]
     [Required, MaxLength(50)]
     public string Username { get; set; }
@@ -39,16 +42,28 @@ public class User : BaseEntity
     public string ExternalAuthId { get; set; }
 
     // Relationships
+    public Guid AddressId { get; set; }
     [JsonPropertyName("addresses")]
     public virtual ICollection<Address> Addresses { get; set; }
-
-    [JsonPropertyName("orders")]
-    [InverseProperty("User")]
+    public Guid? OrderId {  get; set; }
+    //[JsonPropertyName("orders")]
+    //[InverseProperty("User")]
     public virtual ICollection<Order> Orders { get; set; }
+
+    //[JsonPropertyName("organizationId")]
+    //public Guid? OrganizationId { get; set; }
+    public Guid? ItemId { get; set; }
+    [JsonPropertyName("items")]
+    public virtual ICollection<Item> Items { get; set; }
+
+    
+    //[ForeignKey("OrganizationId")]
+    //public virtual Organization Organization { get; set; }
 
     public User()
     {
         Addresses = new HashSet<Address>();
         Orders = new HashSet<Order>();
+        Items = new HashSet<Item>();
     }
 }

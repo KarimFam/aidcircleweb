@@ -21,9 +21,9 @@ namespace H4H.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Address> GetByIdAsync(int id)
+        public async Task<Address> GetByIdAsync(Guid addressId)
         {
-            return await _context.Addresses.FindAsync(id);
+            return await _context.Addresses.FindAsync(addressId);
         }
 
         public async Task<List<Address>> GetAllAsync()
@@ -71,30 +71,36 @@ namespace H4H.Infrastructure.Repositories
         //    return await _context.Addresses.Where(a => a.PostalCode == postalCode).ToListAsync();
         //}
 
-        //public async Task<List<Address>> GetAddressbyUserIDAsync(int userId)
+        public async Task<List<Address>> GetAddressByUserIdAsync(Guid userId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == userId).ToListAsync();
+        }
+
+
+
+        public async Task<List<Address>> GetAddressesByItemIdAsync(Guid itemId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == itemId).ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressByOrderIdAsync(Guid orderId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == orderId).ToListAsync();
+        }
+
+        public async Task<List<Address>> GetAddressByOrganizationIdAsync(Guid organizationId)
+        {
+            return await _context.Addresses.Where(a => a.AddressId == organizationId).ToListAsync();
+        }
+        //public async Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId)
         //{
-        //    return await _context.Addresses.Where(a => a.AddressableId == userId && a.AddressableType == "User").ToListAsync();
+        //    return await _context.Addresses.Where(a => a.AddressableId == organizationId && a.AddressableType == "Organization").ToListAsync();
         //}
 
-        public async Task<List<Address>> GetAddressesByUserIdAsync(int userId)
-        {
-            return await _context.Addresses.Where(a => a.AddressableId == userId && a.AddressableType == "User").ToListAsync();
-        }
-
-        public async Task<List<Address>> GetAddressesByVolunteerIdAsync(int volunteerId)
-        {
-            return await _context.Addresses.Where(a => a.AddressableId == volunteerId && a.AddressableType == "Volunteer").ToListAsync();
-        }
-
-        public async Task<List<Address>> GetAddressesByOrganizationIdAsync(int organizationId)
-        {
-            return await _context.Addresses.Where(a => a.AddressableId == organizationId && a.AddressableType == "Organization").ToListAsync();
-        }
-
-        public async Task<List<Address>> GetAddressesByItemIdAsync(int itemId)
-        {
-            return await _context.Addresses.Where(a => a.AddressableId == itemId && a.AddressableType == "Item").ToListAsync();
-        }
+        //public async Task<List<Address>> GetAddressesByItemIdAsync(int itemId)
+        //{
+        //    return await _context.Addresses.Where(a => a.AddressableId == itemId && a.AddressableType == "Item").ToListAsync();
+        //}
 
     }
 }

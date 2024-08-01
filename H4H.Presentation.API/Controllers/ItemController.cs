@@ -26,12 +26,12 @@ namespace H4H.Presentation.API.Controllers
 
         // GET: api/item/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetItemById(int id)
+        public async Task<IActionResult> GetItemById(Guid itemid)
         {
-            var item = await _itemService.GetItemByIdAsync(id);
+            var item = await _itemService.GetItemByIdAsync(itemid);
             if (item == null)
             {
-                return NotFound($"Item with ID {id} not found.");
+                return NotFound($"Item with ID {itemid} not found.");
             }
             return Ok(item);
         }
@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _itemService.AddItemAsync(item);
-            return CreatedAtAction(nameof(GetItemById), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetItemById), new { itemid = item.ItemId }, item);
         }
 
         // PUT: api/item/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, [FromBody] Item item)
+        public async Task<IActionResult> UpdateItem(Guid id, [FromBody] Item item)
         {
-            if (item == null || id != item.Id)
+            if (item == null || id != item.ItemId)
             {
                 return BadRequest("Item is null or ID mismatch.");
             }
@@ -64,9 +64,9 @@ namespace H4H.Presentation.API.Controllers
 
         // DELETE: api/item/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteItem(int id)
+        public async Task<IActionResult> DeleteItem(Guid itemid)
         {
-            await _itemService.DeleteItemAsync(id);
+            await _itemService.DeleteItemAsync(itemid);
             return NoContent();
         }
     }

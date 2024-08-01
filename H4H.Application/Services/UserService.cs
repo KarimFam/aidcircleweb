@@ -10,80 +10,38 @@ namespace H4H.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, ILogger<UserService> logger)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            try
-            {
-                return await _userRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving users");
-                throw; // Consider the appropriate error handling strategy for your application
-            }
+            return await _userRepository.GetAllAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(int id)
+        public async Task<User> GetUserByIdAsync(Guid userId)
         {
-            try
-            {
-                return await _userRepository.GetByIdAsync(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving user with ID {id}");
-                throw;
-            }
+            return await _userRepository.GetByIdAsync(userId);
         }
 
         public async Task AddUserAsync(User user)
         {
-            try
-            {
-                await _userRepository.AddAsync(user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding new user");
-                throw;
-            }
+            await _userRepository.AddAsync(user);
         }
 
         public async Task UpdateUserAsync(User user)
         {
-            try
-            {
-                await _userRepository.UpdateAsync(user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating user with ID {user.Id}");
-                throw;
-            }
+            await _userRepository.UpdateAsync(user);
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(Guid userId)
         {
-            try
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user != null)
             {
-                var user = await _userRepository.GetByIdAsync(id);
-                if (user != null)
-                {
-                    await _userRepository.DeleteAsync(user);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error deleting user with ID {id}");
-                throw;
+                await _userRepository.DeleteAsync(user);
             }
         }
     }

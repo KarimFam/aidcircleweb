@@ -6,7 +6,7 @@ namespace H4H.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> GetByIdAsync(int id);
+        Task<User> GetByIdAsync(Guid id);
         Task<List<User>> GetAllAsync();
         Task AddAsync(User entity);
         Task UpdateAsync(User entity);

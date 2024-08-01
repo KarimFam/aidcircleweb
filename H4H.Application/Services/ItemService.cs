@@ -10,80 +10,38 @@ namespace H4H.Application.Services
     public class ItemService : IItemService
     {
         private readonly IItemRepository _itemRepository;
-        private readonly ILogger<ItemService> _logger;
 
-        public ItemService(IItemRepository itemRepository, ILogger<ItemService> logger)
+        public ItemService(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<Item>> GetAllItemsAsync()
         {
-            try
-            {
-                return await _itemRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving items");
-                throw;
-            }
+            return await _itemRepository.GetAllAsync();
         }
 
-        public async Task<Item> GetItemByIdAsync(int id)
+        public async Task<Item> GetItemByIdAsync(Guid itemId) // Change to Guid to match ItemId type
         {
-            try
-            {
-                return await _itemRepository.GetByIdAsync(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while retrieving item with ID {id}");
-                throw;
-            }
+            return await _itemRepository.GetByIdAsync(itemId);
         }
 
         public async Task AddItemAsync(Item item)
         {
-            try
-            {
-                await _itemRepository.AddAsync(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while adding a new item");
-                throw;
-            }
+            await _itemRepository.AddAsync(item);
         }
 
         public async Task UpdateItemAsync(Item item)
         {
-            try
-            {
-                await _itemRepository.UpdateAsync(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while updating item with ID {item.Id}");
-                throw;
-            }
+            await _itemRepository.UpdateAsync(item);
         }
 
-        public async Task DeleteItemAsync(int id)
+        public async Task DeleteItemAsync(Guid itemId) // Change to Guid to match ItemId type
         {
-            try
+            var item = await _itemRepository.GetByIdAsync(itemId);
+            if (item != null)
             {
-                var item = await _itemRepository.GetByIdAsync(id);
-                if (item != null)
-                {
-                    await _itemRepository.DeleteAsync(item);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while deleting item with ID {id}");
-                throw;
+                await _itemRepository.DeleteAsync(item);
             }
         }
     }

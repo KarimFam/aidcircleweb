@@ -26,12 +26,12 @@ namespace H4H.Presentation.API.Controllers
 
         // GET: api/volunteer/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetVolunteerById(int id)
+        public async Task<IActionResult> GetVolunteerById(Guid volunteerId)
         {
-            var volunteer = await _volunteerService.GetVolunteerByIdAsync(id);
+            var volunteer = await _volunteerService.GetVolunteerByIdAsync(volunteerId);
             if (volunteer == null)
             {
-                return NotFound($"Volunteer with ID {id} not found.");
+                return NotFound($"Volunteer with ID {volunteerId} not found.");
             }
             return Ok(volunteer);
         }
@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _volunteerService.AddVolunteerAsync(volunteer);
-            return CreatedAtAction(nameof(GetVolunteerById), new { id = volunteer.Id }, volunteer);
+            return CreatedAtAction(nameof(GetVolunteerById), new { volunteerId = volunteer.VolunteerId }, volunteer);
         }
 
         // PUT: api/volunteer/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVolunteer(int id, [FromBody] Volunteer volunteer)
+        public async Task<IActionResult> UpdateVolunteer(Guid id, [FromBody] Volunteer volunteer)
         {
-            if (volunteer == null || id != volunteer.Id)
+            if (volunteer == null || id != volunteer.VolunteerId)
             {
                 return BadRequest("Volunteer data is null or ID mismatch.");
             }
@@ -64,15 +64,15 @@ namespace H4H.Presentation.API.Controllers
 
         // DELETE: api/volunteer/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVolunteer(int id)
+        public async Task<IActionResult> DeleteVolunteer(Guid volunteerId)
         {
-            var volunteer = await _volunteerService.GetVolunteerByIdAsync(id);
+            var volunteer = await _volunteerService.GetVolunteerByIdAsync(volunteerId);
             if (volunteer == null)
             {
-                return NotFound($"Volunteer with ID {id} not found.");
+                return NotFound($"Volunteer with ID {volunteerId} not found.");
             }
 
-            await _volunteerService.DeleteVolunteerAsync(id);
+            await _volunteerService.DeleteVolunteerAsync(volunteerId);
             return NoContent();
         }
     }

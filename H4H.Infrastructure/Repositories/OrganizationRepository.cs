@@ -17,11 +17,11 @@ namespace H4H.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Organization> GetByIdAsync(int id)
+        public async Task<Organization> GetByIdAsync(Guid id)
         {
             return await _context.Organizations
                                  .Include(org => org.Addresses) // Include related entities as needed
-                                 .FirstOrDefaultAsync(org => org.Id == id);
+                                 .FirstOrDefaultAsync(org => org.OrganizationId == id);
         }
 
         public async Task<List<Organization>> GetAllAsync()
