@@ -24,14 +24,14 @@ namespace H4H.Presentation.API.Controllers
             return Ok(organizations);
         }
 
-        // GET: api/organization/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrganizationById(Guid id)
+        // GET: api/organization/{OrganizationId}
+        [HttpGet("{OrganizationId}")]
+        public async Task<IActionResult> GetOrganizationById(Guid OrganizationId)
         {
-            var organization = await _organizationService.GetOrganizationByIdAsync(id);
+            var organization = await _organizationService.GetOrganizationByIdAsync(OrganizationId);
             if (organization == null)
             {
-                return NotFound($"Organization with ID {id} not found.");
+                return NotFound($"Organization with ID {OrganizationId} not found.");
             }
             return Ok(organization);
         }
@@ -42,37 +42,37 @@ namespace H4H.Presentation.API.Controllers
         {
             if (organization == null)
             {
-                return BadRequest("Organization data is null.");
+                return BadRequest("Organization is null.");
             }
 
             await _organizationService.AddOrganizationAsync(organization);
-            return CreatedAtAction(nameof(GetOrganizationById), new { id = organization.OrganizationId }, organization);
+            return CreatedAtAction(nameof(GetOrganizationById), new { OrganizationId = organization.OrganizationId }, organization);
         }
 
-        // PUT: api/organization/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrganization(Guid id, [FromBody] Organization organization)
+        // PUT: api/organization/{OrganizationId}
+        [HttpPut("{OrganizationId}")]
+        public async Task<IActionResult> UpdateOrganization(Guid OrganizationId, [FromBody] Organization organization)
         {
-            if (organization == null || id != organization.OrganizationId)
+            if (organization == null || OrganizationId != organization.OrganizationId)
             {
-                return BadRequest("Organization data is null or ID mismatch.");
+                return BadRequest("Organization is null or ID mismatch.");
             }
 
             await _organizationService.UpdateOrganizationAsync(organization);
             return NoContent();
         }
 
-        // DELETE: api/organization/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrganization(Guid id)
+        // DELETE: api/organization/{OrganizationId}
+        [HttpDelete("{OrganizationId}")]
+        public async Task<IActionResult> DeleteOrganization(Guid OrganizationId)
         {
-            var organization = await _organizationService.GetOrganizationByIdAsync(id);
+            var organization = await _organizationService.GetOrganizationByIdAsync(OrganizationId);
             if (organization == null)
             {
-                return NotFound($"Organization with ID {id} not found.");
+                return NotFound($"Organization with ID {OrganizationId} not found.");
             }
 
-            await _organizationService.DeleteOrganizationAsync(id);
+            await _organizationService.DeleteOrganizationAsync(OrganizationId);
             return NoContent();
         }
     }

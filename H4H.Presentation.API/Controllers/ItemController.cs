@@ -24,14 +24,14 @@ namespace H4H.Presentation.API.Controllers
             return Ok(items);
         }
 
-        // GET: api/item/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetItemById(Guid itemid)
+        // GET: api/item/{ItemId}
+        [HttpGet("{ItemId}")]
+        public async Task<IActionResult> GetItemById(Guid ItemId)
         {
-            var item = await _itemService.GetItemByIdAsync(itemid);
+            var item = await _itemService.GetItemByIdAsync(ItemId);
             if (item == null)
             {
-                return NotFound($"Item with ID {itemid} not found.");
+                return NotFound($"Item with ID {ItemId} not found.");
             }
             return Ok(item);
         }
@@ -46,14 +46,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _itemService.AddItemAsync(item);
-            return CreatedAtAction(nameof(GetItemById), new { itemid = item.ItemId }, item);
+            return CreatedAtAction(nameof(GetItemById), new { ItemId = item.ItemId }, item);
         }
 
-        // PUT: api/item/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(Guid id, [FromBody] Item item)
+        // PUT: api/item/{ItemId}
+        [HttpPut("{ItemId}")]
+        public async Task<IActionResult> UpdateItem(Guid ItemId, [FromBody] Item item)
         {
-            if (item == null || id != item.ItemId)
+            if (item == null || ItemId != item.ItemId)
             {
                 return BadRequest("Item is null or ID mismatch.");
             }
@@ -62,11 +62,17 @@ namespace H4H.Presentation.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/item/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteItem(Guid itemid)
+        // DELETE: api/item/{ItemId}
+        [HttpDelete("{ItemId}")]
+        public async Task<IActionResult> DeleteItem(Guid ItemId)
         {
-            await _itemService.DeleteItemAsync(itemid);
+            var item = await _itemService.GetItemByIdAsync(ItemId);
+            if (item == null)
+            {
+                return NotFound($"Item with ID {ItemId} not found.");
+            }
+
+            await _itemService.DeleteItemAsync(ItemId);
             return NoContent();
         }
     }

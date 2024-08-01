@@ -28,16 +28,17 @@ namespace H4H.Presentation.API.Controllers
             return Ok(users);
         }
 
-        // GET: api/user/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(Guid id)
+        // GET: api/user/{UserId}
+        [HttpGet("{UserId}")]
+        public async Task<IActionResult> GetUserById(Guid UserId)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(UserId);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound($"User with ID {UserId} not found.");
             }
             return Ok(user);
+
         }
 
         // POST: api/user
@@ -50,16 +51,15 @@ namespace H4H.Presentation.API.Controllers
             }
 
             // Add additional validation here if needed
-
             await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
+            return CreatedAtAction(nameof(GetUserById), new { UserId = user.UserId }, user);
         }
 
-        // PUT: api/user/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] User user)
+        // PUT: api/user/{UserId}
+        [HttpPut("{UserId}")]
+        public async Task<IActionResult> UpdateUser(Guid UserId, [FromBody] User user)
         {
-            if (user == null || id != user.UserId)
+            if (user == null || UserId != user.UserId)
             {
                 return BadRequest("User is null or ID mismatch.");
             }
@@ -70,17 +70,17 @@ namespace H4H.Presentation.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/user/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        // DELETE: api/user/{UserId}
+        [HttpDelete("{UserId}")]
+        public async Task<IActionResult> DeleteUser(Guid UserId)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(UserId);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound($"User with ID {UserId} not found.");
             }
 
-            await _userService.DeleteUserAsync(id);
+            await _userService.DeleteUserAsync(UserId);
             return NoContent();
         }
     }

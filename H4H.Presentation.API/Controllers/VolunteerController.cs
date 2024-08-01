@@ -2,7 +2,6 @@
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
 using System.Threading.Tasks;
-
 namespace H4H.Presentation.API.Controllers
 {
     [ApiController]
@@ -24,14 +23,14 @@ namespace H4H.Presentation.API.Controllers
             return Ok(volunteers);
         }
 
-        // GET: api/volunteer/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetVolunteerById(Guid volunteerId)
+        // GET: api/volunteer/{VolunteerId}
+        [HttpGet("{VolunteerId}")]
+        public async Task<IActionResult> GetVolunteerById(Guid VolunteerId)
         {
-            var volunteer = await _volunteerService.GetVolunteerByIdAsync(volunteerId);
+            var volunteer = await _volunteerService.GetVolunteerByIdAsync(VolunteerId);
             if (volunteer == null)
             {
-                return NotFound($"Volunteer with ID {volunteerId} not found.");
+                return NotFound($"Volunteer with ID {VolunteerId} not found.");
             }
             return Ok(volunteer);
         }
@@ -46,14 +45,14 @@ namespace H4H.Presentation.API.Controllers
             }
 
             await _volunteerService.AddVolunteerAsync(volunteer);
-            return CreatedAtAction(nameof(GetVolunteerById), new { volunteerId = volunteer.VolunteerId }, volunteer);
+            return CreatedAtAction(nameof(GetVolunteerById), new { VolunteerId = volunteer.VolunteerId }, volunteer);
         }
 
-        // PUT: api/volunteer/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVolunteer(Guid id, [FromBody] Volunteer volunteer)
+        // PUT: api/volunteer/{VolunteerId}
+        [HttpPut("{VolunteerId}")]
+        public async Task<IActionResult> UpdateVolunteer(Guid VolunteerId, [FromBody] Volunteer volunteer)
         {
-            if (volunteer == null || id != volunteer.VolunteerId)
+            if (volunteer == null || VolunteerId != volunteer.VolunteerId)
             {
                 return BadRequest("Volunteer data is null or ID mismatch.");
             }
@@ -62,17 +61,17 @@ namespace H4H.Presentation.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/volunteer/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVolunteer(Guid volunteerId)
+        // DELETE: api/volunteer/{VolunteerId}
+        [HttpDelete("{VolunteerId}")]
+        public async Task<IActionResult> DeleteVolunteer(Guid VolunteerId)
         {
-            var volunteer = await _volunteerService.GetVolunteerByIdAsync(volunteerId);
+            var volunteer = await _volunteerService.GetVolunteerByIdAsync(VolunteerId);
             if (volunteer == null)
             {
-                return NotFound($"Volunteer with ID {volunteerId} not found.");
+                return NotFound($"Volunteer with ID {VolunteerId} not found.");
             }
 
-            await _volunteerService.DeleteVolunteerAsync(volunteerId);
+            await _volunteerService.DeleteVolunteerAsync(VolunteerId);
             return NoContent();
         }
     }
