@@ -17,10 +17,10 @@ public class OrderRepository : IOrderRepository
     public async Task<Order> GetOrderByIdAsync(Guid OrderId)
     {
         return await _context.Orders
-            .Include(o => o.Users)
-            .Include(o => o.Items)
-           // .Include(o => o.Volunteers)
-            .Include(o => o.Addresses)
+            // .Include(o => o.Users)
+            // .Include(o => o.Items)
+            //// .Include(o => o.Volunteers)
+            // .Include(o => o.Addresses)
             .FirstOrDefaultAsync(o => o.OrderId == OrderId);
     }
 

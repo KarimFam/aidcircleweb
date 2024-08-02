@@ -20,16 +20,16 @@ namespace H4H.Domain.Entities
 
         [JsonPropertyName("items")]
         [InverseProperty("Order")]
-        public virtual ICollection<Item> Items { get; set; }
+        public ICollection<Item> Items { get; set; }
 
 
 
         //   [JsonPropertyName("volunteers")]
-      public virtual ICollection<User> Users { get; set; }
+      public ICollection<User> Users { get; set; }
 
         // Same note as for volunteers
 
-        public virtual ICollection<Address> Addresses { get; set; }
+        public ICollection<Address> Addresses { get; set; }
 
         public Order()
         {
