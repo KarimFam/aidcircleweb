@@ -41,10 +41,14 @@ public class User : BaseEntity
     [MaxLength(255)]
     public string ExternalAuthId { get; set; }
 
+    public List<Address> Addresses { get; set; }
+
     public User()
     {
         UserId = Guid.NewGuid();
         CreatedDate = DateTime.Now;
         ModifiedDate = DateTime.Now;
     }
+
+    
 }

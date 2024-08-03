@@ -23,6 +23,7 @@ namespace H4H.Domain.Entities
         [MaxLength(1000)]
         public string Description { get; set; }
 
+        public Address? ItemAddress { get; set; }
         public Item()
         {
             ItemId = Guid.NewGuid();

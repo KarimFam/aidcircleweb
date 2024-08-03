@@ -22,6 +22,7 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("description")]
         public string Description { get; set; }
 
+        public List<Address> Addresses { get; set; }
         public Organization()
         {
             OrganizationId = Guid.NewGuid();

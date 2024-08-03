@@ -31,43 +31,6 @@ namespace H4H.Infrastructure.Data.Contexts
 
    
 
-            //modelBuilder.Entity<User>()
-            //    .HasMany(u => u.Addresses)
-            //    .WithOne(a => a.User)
-            //    .HasForeignKey(a => a.UserId)
-            //    .OnDelete(DeleteBehavior.SetNull);
-
-
-            //modelBuilder.Entity<Organization>()
-            //    .HasMany(o => o.Addresses)
-            //    .WithOne(a => a.Organization)
-            //    .HasForeignKey(a => a.OrganizationId)
-            //    .OnDelete(DeleteBehavior.SetNull);
-
-
-
-            //modelBuilder.Entity<Item>()
-            //    .HasMany(i => i.Addresses)
-            //    .WithOne(a => a.Item)
-            //    .HasForeignKey(i => i.ItemId)
-            //    .OnDelete(DeleteBehavior.SetNull);
-
-
-
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(i => i.Items)
-            //    .WithOne(o => o.Order)
-            //    .HasForeignKey(i => i.OrderId);
-
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(u => u.Users)
-            //    .WithOne(o => o.Order)
-            //    .HasForeignKey(u => u.UserId);
-
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(a => a.Addresses)
-            //    .WithOne(o => o.Order)
-            //    .HasForeignKey(a => a.OrderId);
 
          
         }
