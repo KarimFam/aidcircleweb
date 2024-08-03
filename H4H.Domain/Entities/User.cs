@@ -41,29 +41,10 @@ public class User : BaseEntity
     [MaxLength(255)]
     public string ExternalAuthId { get; set; }
 
-    // Relationships
-    public Guid AddressId { get; set; }
-    [JsonPropertyName("addresses")]
-    public virtual ICollection<Address> Addresses { get; set; }
-    public Guid? OrderId {  get; set; }
-    //[JsonPropertyName("orders")]
-    //[InverseProperty("User")]
-    public virtual ICollection<Order> Orders { get; set; }
-
-    //[JsonPropertyName("organizationId")]
-    //public Guid? OrganizationId { get; set; }
-    public Guid? ItemId { get; set; }
-    [JsonPropertyName("items")]
-    public virtual ICollection<Item> Items { get; set; }
-
-    
-    //[ForeignKey("OrganizationId")]
-    //public virtual Organization Organization { get; set; }
-
     public User()
     {
-        Addresses = new HashSet<Address>();
-        Orders = new HashSet<Order>();
-        Items = new HashSet<Item>();
+        UserId = Guid.NewGuid();
+        CreatedDate = DateTime.Now;
+        ModifiedDate = DateTime.Now;
     }
 }

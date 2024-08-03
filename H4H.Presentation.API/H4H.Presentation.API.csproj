@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H4H.Application\H4H.Application.csproj" />
-    <ProjectReference Include="..\H4H.Domain\H4H.Domain.csproj" />
     <ProjectReference Include="..\H4H.Infrastructure\H4H.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -16,22 +16,12 @@ public class OrderRepository : IOrderRepository
 
     public async Task<Order> GetOrderByIdAsync(Guid OrderId)
     {
-        return await _context.Orders
-            // .Include(o => o.Users)
-            // .Include(o => o.Items)
-            //// .Include(o => o.Volunteers)
-            // .Include(o => o.Addresses)
-            .FirstOrDefaultAsync(o => o.OrderId == OrderId);
+        return await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == OrderId);
     }
 
     public async Task<List<Order>> GetAllOrdersAsync()
     {
-        return await _context.Orders
-            .Include(o => o.Users)
-            .Include(o => o.Items)
-           // .Include(o => o.Volunteers)
-            .Include(o => o.Addresses)
-            .ToListAsync();
+        return await _context.Orders.ToListAsync();
     }
 
     public async Task AddOrderAsync(Order order)

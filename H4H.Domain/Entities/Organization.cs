@@ -22,27 +22,11 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        // Relationships
-        [JsonPropertyName("addresses")]
-        public Guid? AddressId { get; set; }
-        public virtual ICollection<Address> Addresses { get; set; }
-
-        [JsonPropertyName("users")]
-        public Guid? UserId { get; set; }
-
-        public virtual ICollection<User> Users { get; set; }
-
-        [JsonPropertyName("items")]
-        public Guid? ItemId { get; set; }
-
-        public virtual ICollection<Item> Items { get; set; }
-
         public Organization()
         {
-            Addresses = new HashSet<Address>();
-          
-            Items = new HashSet<Item>();
-            Users = new HashSet<User>();    
+            OrganizationId = Guid.NewGuid();
+            CreatedDate = DateTime.Now;
+            ModifiedDate = DateTime.Now;
         }
     }
 

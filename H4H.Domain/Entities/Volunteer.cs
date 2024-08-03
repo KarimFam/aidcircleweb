@@ -9,11 +9,13 @@ public class Volunteer : User
     public Guid VolunteerId { get; set; }
 
     [JsonPropertyName("skills")]
-    public string Skills { get; set; }
-  //  public virtual ICollection<Order> Order { get; set; }
-    public Volunteer(): base(){
-   // Orders = new HashSet<Order>();  
-    }
+    public string? Skills { get; set; }
 
+    public Volunteer()
+    {
+        VolunteerId = Guid.NewGuid();
+        CreatedDate = DateTime.Now;
+        ModifiedDate = DateTime.Now;
+    }
 
 }
