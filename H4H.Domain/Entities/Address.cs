@@ -14,7 +14,7 @@ namespace H4H.Domain.Entities
 
         [JsonPropertyName("line2")]
         [MaxLength(255)]
-        public string Line2 { get; set; }
+        public string? Line2 { get; set; }
 
         [JsonPropertyName("city")]
         [Required, MaxLength(100)]
@@ -49,8 +49,6 @@ namespace H4H.Domain.Entities
 
         public Guid? OrganizationId { get; set; }
         public Organization? Organization { get; set; }
-
-
 
 
 

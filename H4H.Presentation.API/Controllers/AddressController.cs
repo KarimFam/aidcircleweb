@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
+using H4H.Presentation.API.Data;
+using System;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace H4H.Presentation.API.Controllers
 {
@@ -10,10 +13,12 @@ namespace H4H.Presentation.API.Controllers
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _addressService;
+        private readonly IMapper _mapper;
 
-        public AddressController(IAddressService addressService)
+        public AddressController(IAddressService addressService, IMapper mapper)
         {
             _addressService = addressService;
+            _mapper = mapper;
         }
 
         // GET: api/address
@@ -21,7 +26,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAllAddresses()
         {
             var addresses = await _addressService.GetAllAddressesAsync();
-            return Ok(addresses);
+            var addressDtos = _mapper.Map<IEnumerable<AddressDto>>(addresses);
+            return Ok(addressDtos);
         }
 
         // GET: api/address/{AddressId}
@@ -33,31 +39,34 @@ namespace H4H.Presentation.API.Controllers
             {
                 return NotFound($"Address with ID {AddressId} not found.");
             }
-            return Ok(address);
+            var addressDto = _mapper.Map<AddressDto>(address);
+            return Ok(addressDto);
         }
 
         // POST: api/address
         [HttpPost]
-        public async Task<IActionResult> CreateAddress([FromBody] Address address)
+        public async Task<IActionResult> CreateAddress([FromBody] AddressDto addressDto)
         {
-            if (address == null)
+            if (addressDto == null)
             {
                 return BadRequest("Address is null.");
             }
 
+            var address = _mapper.Map<Address>(addressDto);
             await _addressService.AddAddressAsync(address);
-            return CreatedAtAction(nameof(GetAddressById), new { AddressId = address.AddressId }, address);
+            return CreatedAtAction(nameof(GetAddressById), new { AddressId = address.AddressId }, addressDto);
         }
 
         // PUT: api/address/{AddressId}
         [HttpPut("{AddressId}")]
-        public async Task<IActionResult> UpdateAddress(Guid AddressId, [FromBody] Address address)
+        public async Task<IActionResult> UpdateAddress(Guid AddressId, [FromBody] AddressDto addressDto)
         {
-            if (address == null || AddressId != address.AddressId)
+            if (addressDto == null || AddressId != addressDto.AddressId)
             {
                 return BadRequest("Address is null or ID mismatch.");
             }
 
+            var address = _mapper.Map<Address>(addressDto);
             await _addressService.UpdateAddressAsync(address);
             return NoContent();
         }
@@ -81,7 +90,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAddressesByUserId(Guid UserId)
         {
             var addresses = await _addressService.GetAddressesByUserIdAsync(UserId);
-            return Ok(addresses);
+            var addressDtos = _mapper.Map<IEnumerable<AddressDto>>(addresses);
+            return Ok(addressDtos);
         }
 
         // GET: api/address/organization/{OrganizationId}
@@ -89,7 +99,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAddressesByOrganizationId(Guid OrganizationId)
         {
             var addresses = await _addressService.GetAddressesByOrganizationIdAsync(OrganizationId);
-            return Ok(addresses);
+            var addressDtos = _mapper.Map<IEnumerable<AddressDto>>(addresses);
+            return Ok(addressDtos);
         }
 
         // GET: api/address/item/{ItemId}
@@ -97,7 +108,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAddressesByItemId(Guid ItemId)
         {
             var addresses = await _addressService.GetAddressesByItemIdAsync(ItemId);
-            return Ok(addresses);
+            var addressDtos = _mapper.Map<IEnumerable<AddressDto>>(addresses);
+            return Ok(addressDtos);
         }
 
         // GET: api/address/order/{OrderId}
@@ -105,7 +117,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAddressesByOrderId(Guid OrderId)
         {
             var addresses = await _addressService.GetAddressesByOrderIdAsync(OrderId);
-            return Ok(addresses);
+            var addressDtos = _mapper.Map<IEnumerable<AddressDto>>(addresses);
+            return Ok(addressDtos);
         }
     }
 }

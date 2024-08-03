@@ -41,8 +41,9 @@ public class User : BaseEntity
     [MaxLength(255)]
     public string ExternalAuthId { get; set; }
 
+    public List<Item> Items { get; set; }
     public List<Address> Addresses { get; set; }
-
+    public List<Order> Orders { get; set; } 
     public User()
     {
         UserId = Guid.NewGuid();
