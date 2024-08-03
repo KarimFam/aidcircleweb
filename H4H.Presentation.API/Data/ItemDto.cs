@@ -12,7 +12,7 @@ namespace H4H.Presentation.API.Data
    //     public Guid? ItemId { get; set; }
         public Guid? OrderId { get; set; }
     
-        public AddressDto Address { get; set; }
+    //    public AddressDto Address { get; set; }
 
 
     }
