@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
+using H4H.Presentation.API.Data;
+using System;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace H4H.Presentation.API.Controllers
 {
@@ -10,10 +13,12 @@ namespace H4H.Presentation.API.Controllers
     public class OrganizationController : ControllerBase
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IMapper _mapper;
 
-        public OrganizationController(IOrganizationService organizationService)
+        public OrganizationController(IOrganizationService organizationService, IMapper mapper)
         {
             _organizationService = organizationService;
+            _mapper = mapper;
         }
 
         // GET: api/organization
@@ -21,7 +26,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAllOrganizations()
         {
             var organizations = await _organizationService.GetAllOrganizationsAsync();
-            return Ok(organizations);
+            var organizationDtos = _mapper.Map<IEnumerable<OrganizationDto>>(organizations);
+            return Ok(organizationDtos);
         }
 
         // GET: api/organization/{OrganizationId}
@@ -33,32 +39,42 @@ namespace H4H.Presentation.API.Controllers
             {
                 return NotFound($"Organization with ID {OrganizationId} not found.");
             }
-            return Ok(organization);
+            var organizationDto = _mapper.Map<OrganizationDto>(organization);
+            return Ok(organizationDto);
         }
 
         // POST: api/organization
         [HttpPost]
-        public async Task<IActionResult> CreateOrganization([FromBody] Organization organization)
+        public async Task<IActionResult> CreateOrganization([FromBody] OrganizationDto organizationDto)
         {
-            if (organization == null)
+            if (organizationDto == null)
             {
                 return BadRequest("Organization is null.");
             }
 
+            var organization = _mapper.Map<Organization>(organizationDto);
             await _organizationService.AddOrganizationAsync(organization);
-            return CreatedAtAction(nameof(GetOrganizationById), new { OrganizationId = organization.OrganizationId }, organization);
+            var createdOrganizationDto = _mapper.Map<OrganizationDto>(organization);
+            return CreatedAtAction(nameof(GetOrganizationById), new { OrganizationId = organization.OrganizationId }, createdOrganizationDto);
         }
 
         // PUT: api/organization/{OrganizationId}
         [HttpPut("{OrganizationId}")]
-        public async Task<IActionResult> UpdateOrganization(Guid OrganizationId, [FromBody] Organization organization)
+        public async Task<IActionResult> UpdateOrganization(Guid OrganizationId, [FromBody] OrganizationDto organizationDto)
         {
-            if (organization == null || OrganizationId != organization.OrganizationId)
+            if (organizationDto == null)
             {
-                return BadRequest("Organization is null or ID mismatch.");
+                return BadRequest("Organization is null.");
             }
 
-            await _organizationService.UpdateOrganizationAsync(organization);
+            var existingOrganization = await _organizationService.GetOrganizationByIdAsync(OrganizationId);
+            if (existingOrganization == null)
+            {
+                return NotFound($"Organization with ID {OrganizationId} not found.");
+            }
+
+            _mapper.Map(organizationDto, existingOrganization);
+            await _organizationService.UpdateOrganizationAsync(existingOrganization);
             return NoContent();
         }
 

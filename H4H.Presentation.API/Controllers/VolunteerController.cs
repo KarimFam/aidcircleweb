@@ -1,67 +1,83 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
+using H4H.Presentation.API.Data;
+using System;
 using System.Threading.Tasks;
+using AutoMapper;
+
 namespace H4H.Presentation.API.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    public class VolunteerController : ControllerBase
     {
-        private readonly IVolunteerService _volunteerService;
-
-        public VolunteerController(IVolunteerService volunteerService)
+        [ApiController]
+        [Route("api/[controller]")]
+        public class VolunteerController : ControllerBase
         {
-            _volunteerService = volunteerService;
-        }
+            private readonly IVolunteerService _volunteerService;
+            private readonly IMapper _mapper;
 
-        // GET: api/volunteer
-        [HttpGet]
-        public async Task<IActionResult> GetAllVolunteers()
-        {
-            var volunteers = await _volunteerService.GetAllVolunteersAsync();
-            return Ok(volunteers);
-        }
-
-        // GET: api/volunteer/{VolunteerId}
-        [HttpGet("{VolunteerId}")]
-        public async Task<IActionResult> GetVolunteerById(Guid VolunteerId)
-        {
-            var volunteer = await _volunteerService.GetVolunteerByIdAsync(VolunteerId);
-            if (volunteer == null)
+            public VolunteerController(IVolunteerService volunteerService, IMapper mapper)
             {
-                return NotFound($"Volunteer with ID {VolunteerId} not found.");
-            }
-            return Ok(volunteer);
-        }
-
-        // POST: api/volunteer
-        [HttpPost]
-        public async Task<IActionResult> CreateVolunteer([FromBody] Volunteer volunteer)
-        {
-            if (volunteer == null)
-            {
-                return BadRequest("Volunteer data is null.");
+                _volunteerService = volunteerService;
+                _mapper = mapper;
             }
 
-            await _volunteerService.AddVolunteerAsync(volunteer);
-            return CreatedAtAction(nameof(GetVolunteerById), new { VolunteerId = volunteer.VolunteerId }, volunteer);
-        }
-
-        // PUT: api/volunteer/{VolunteerId}
-        [HttpPut("{VolunteerId}")]
-        public async Task<IActionResult> UpdateVolunteer(Guid VolunteerId, [FromBody] Volunteer volunteer)
-        {
-            if (volunteer == null || VolunteerId != volunteer.VolunteerId)
+            // GET: api/volunteer
+            [HttpGet]
+            public async Task<IActionResult> GetAllVolunteers()
             {
-                return BadRequest("Volunteer data is null or ID mismatch.");
+                var volunteers = await _volunteerService.GetAllVolunteersAsync();
+                var volunteerDtos = _mapper.Map<IEnumerable<VolunteerDto>>(volunteers);
+                return Ok(volunteerDtos);
             }
 
-            await _volunteerService.UpdateVolunteerAsync(volunteer);
-            return NoContent();
-        }
+            // GET: api/volunteer/{VolunteerId}
+            [HttpGet("{VolunteerId}")]
+            public async Task<IActionResult> GetVolunteerById(Guid VolunteerId)
+            {
+                var volunteer = await _volunteerService.GetVolunteerByIdAsync(VolunteerId);
+                if (volunteer == null)
+                {
+                    return NotFound($"Volunteer with ID {VolunteerId} not found.");
+                }
+                var volunteerDto = _mapper.Map<VolunteerDto>(volunteer);
+                return Ok(volunteerDto);
+            }
 
-        // DELETE: api/volunteer/{VolunteerId}
+            // POST: api/volunteer
+            [HttpPost]
+            public async Task<IActionResult> CreateVolunteer([FromBody] VolunteerDto volunteerDto)
+            {
+                if (volunteerDto == null)
+                {
+                    return BadRequest("Volunteer is null.");
+                }
+
+                var volunteer = _mapper.Map<Volunteer>(volunteerDto);
+                await _volunteerService.AddVolunteerAsync(volunteer);
+                var createdVolunteerDto = _mapper.Map<VolunteerDto>(volunteer);
+                return CreatedAtAction(nameof(GetVolunteerById), new { VolunteerId = volunteer.VolunteerId }, createdVolunteerDto);
+            }
+
+            // PUT: api/volunteer/{VolunteerId}
+            [HttpPut("{VolunteerId}")]
+            public async Task<IActionResult> UpdateVolunteer(Guid VolunteerId, [FromBody] VolunteerDto volunteerDto)
+            {
+                if (volunteerDto == null)
+                {
+                    return BadRequest("Volunteer is null.");
+                }
+
+                var existingVolunteer = await _volunteerService.GetVolunteerByIdAsync(VolunteerId);
+                if (existingVolunteer == null)
+                {
+                    return NotFound($"Volunteer with ID {VolunteerId} not found.");
+                }
+
+                _mapper.Map(volunteerDto, existingVolunteer);
+                await _volunteerService.UpdateVolunteerAsync(existingVolunteer);
+                return NoContent();
+            }
+
         [HttpDelete("{VolunteerId}")]
         public async Task<IActionResult> DeleteVolunteer(Guid VolunteerId)
         {
@@ -75,4 +91,5 @@ namespace H4H.Presentation.API.Controllers
             return NoContent();
         }
     }
-}
+        
+    }
