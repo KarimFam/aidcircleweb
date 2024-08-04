@@ -9,6 +9,9 @@ namespace H4H.Domain.Entities
         [JsonPropertyName("orderId")]
         public Guid OrderId { get; set; }
         
+        public List<Item> Items { get; set; } = new List<Item>();
+        public List<User> Users { get; set; } = new List<User>();
+        public List<Organization> Organizations { get; set; } = new List<Organization>();
         public Order()
         {
             OrderId = Guid.NewGuid();
