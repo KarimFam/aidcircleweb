@@ -61,10 +61,10 @@ namespace H4H.Presentation.API.Controllers
         [HttpPut("{AddressId}")]
         public async Task<IActionResult> UpdateAddress(Guid AddressId, [FromBody] AddressDto addressDto)
         {
-            if (addressDto == null || AddressId != addressDto.AddressId)
-            {
-                return BadRequest("Address is null or ID mismatch.");
-            }
+            //if (addressDto == null || AddressId != addressDto.AddressId)
+            //{
+            //    return BadRequest("Address is null or ID mismatch.");
+            //}
 
             var address = _mapper.Map<Address>(addressDto);
             await _addressService.UpdateAddressAsync(address);

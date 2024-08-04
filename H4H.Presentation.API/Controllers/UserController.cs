@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
+using H4H.Presentation.API.Data;
+using System;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace H4H.Presentation.API.Controllers
 {
@@ -10,10 +13,12 @@ namespace H4H.Presentation.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         // GET: api/user
@@ -21,11 +26,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
-            if (users == null)
-            {
-                return NotFound("Users not found.");
-            }
-            return Ok(users);
+            var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+            return Ok(userDtos);
         }
 
         // GET: api/user/{UserId}
@@ -37,36 +39,42 @@ namespace H4H.Presentation.API.Controllers
             {
                 return NotFound($"User with ID {UserId} not found.");
             }
-            return Ok(user);
-
+            var userDto = _mapper.Map<UserDto>(user);
+            return Ok(userDto);
         }
 
         // POST: api/user
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
         {
-            if (user == null)
+            if (userDto == null)
             {
                 return BadRequest("User is null.");
             }
 
-            // Add additional validation here if needed
+            var user = _mapper.Map<User>(userDto);
             await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { UserId = user.UserId }, user);
+            var createdUserDto = _mapper.Map<UserDto>(user);
+            return CreatedAtAction(nameof(GetUserById), new { UserId = user.UserId }, createdUserDto);
         }
 
         // PUT: api/user/{UserId}
         [HttpPut("{UserId}")]
-        public async Task<IActionResult> UpdateUser(Guid UserId, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(Guid UserId, [FromBody] UserDto userDto)
         {
-            if (user == null || UserId != user.UserId)
+            if (userDto == null)
             {
-                return BadRequest("User is null or ID mismatch.");
+                return BadRequest("User is null.");
             }
 
-            // Additional validation and checks here
+            var existingUser = await _userService.GetUserByIdAsync(UserId);
+            if (existingUser == null)
+            {
+                return NotFound($"User with ID {UserId} not found.");
+            }
 
-            await _userService.UpdateUserAsync(user);
+            _mapper.Map(userDto, existingUser);
+            await _userService.UpdateUserAsync(existingUser);
             return NoContent();
         }
 
