@@ -1,30 +1,21 @@
-﻿using System;
+﻿using H4H.Domain.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace H4H.Domain.Entities
+public class Volunteer : User
 {
-    public class Volunteer : User
+    [JsonPropertyName("volunteerId")]
+    public Guid VolunteerId { get; set; }
+
+    [JsonPropertyName("skills")]
+    public string? Skills { get; set; }
+
+    public Volunteer()
     {
-        // Additional Volunteer-specific properties
-        [JsonPropertyName("skills")]
-        public string Skills { get; set; }
-
-        // Relationships
-        [JsonPropertyName("organizations")]
-        public virtual ICollection<Organization> Organizations { get; set; }
-
-        [JsonPropertyName("assignedItems")]
-        public virtual ICollection<Item> AssignedItems { get; set; }
-
-        public Volunteer()
-        {
-            Organizations = new HashSet<Organization>();
-            AssignedItems = new HashSet<Item>();
-        }
+        VolunteerId = Guid.NewGuid();
+        CreatedDate = DateTime.Now;
+        ModifiedDate = DateTime.Now;
     }
 
 }

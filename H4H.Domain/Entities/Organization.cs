@@ -13,27 +13,25 @@ namespace H4H.Domain.Entities
 {
     public class Organization : BaseEntity
     {
+        [JsonPropertyName("organizationId")]
+        public Guid OrganizationId { get; set; }
+
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
         [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        // Relationships
-        [JsonPropertyName("addresses")]
-        public virtual ICollection<Address> Addresses { get; set; }
+        public List<Address> Addresses { get; set; } = new List<Address>();
 
-        [JsonPropertyName("volunteers")]
-        public virtual ICollection<Volunteer> Volunteers { get; set; }
-
-        [JsonPropertyName("items")]
-        public virtual ICollection<Item> Items { get; set; }
-
+        public List<Order> Orders { get; set; } = new List<Order>();
+       
+        
         public Organization()
         {
-            Addresses = new HashSet<Address>();
-            Volunteers = new HashSet<Volunteer>();
-            Items = new HashSet<Item>();
+            OrganizationId = Guid.NewGuid();
+            CreatedDate = DateTime.Now;
+            ModifiedDate = DateTime.Now;
         }
     }
 

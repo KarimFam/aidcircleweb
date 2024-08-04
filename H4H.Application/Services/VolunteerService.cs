@@ -10,80 +10,38 @@ namespace H4H.Application.Services
     public class VolunteerService : IVolunteerService
     {
         private readonly IVolunteerRepository _volunteerRepository;
-        private readonly ILogger<VolunteerService> _logger;
 
-        public VolunteerService(IVolunteerRepository volunteerRepository, ILogger<VolunteerService> logger)
+        public VolunteerService(IVolunteerRepository volunteerRepository)
         {
             _volunteerRepository = volunteerRepository;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<Volunteer>> GetAllVolunteersAsync()
         {
-            try
-            {
-                return await _volunteerRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving volunteers");
-                throw;
-            }
+            return await _volunteerRepository.GetAllAsync();
         }
 
-        public async Task<Volunteer> GetVolunteerByIdAsync(int id)
+        public async Task<Volunteer> GetVolunteerByIdAsync(Guid VolunteerId) // Change to Guid to match VolunteerId type
         {
-            try
-            {
-                return await _volunteerRepository.GetByIdAsync(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving volunteer with ID {id}");
-                throw;
-            }
+            return await _volunteerRepository.GetByIdAsync(VolunteerId);
         }
 
         public async Task AddVolunteerAsync(Volunteer volunteer)
         {
-            try
-            {
-                await _volunteerRepository.AddAsync(volunteer);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding new volunteer");
-                throw;
-            }
+            await _volunteerRepository.AddAsync(volunteer);
         }
 
         public async Task UpdateVolunteerAsync(Volunteer volunteer)
         {
-            try
-            {
-                await _volunteerRepository.UpdateAsync(volunteer);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating volunteer with ID {volunteer.Id}");
-                throw;
-            }
+            await _volunteerRepository.UpdateAsync(volunteer);
         }
 
-        public async Task DeleteVolunteerAsync(int id)
+        public async Task DeleteVolunteerAsync(Guid VolunteerId) // Change to Guid to match VolunteerId type
         {
-            try
+            var volunteer = await _volunteerRepository.GetByIdAsync(VolunteerId);
+            if (volunteer != null)
             {
-                var volunteer = await _volunteerRepository.GetByIdAsync(id);
-                if (volunteer != null)
-                {
-                    await _volunteerRepository.DeleteAsync(volunteer);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error deleting volunteer with ID {id}");
-                throw;
+                await _volunteerRepository.DeleteAsync(volunteer);
             }
         }
     }

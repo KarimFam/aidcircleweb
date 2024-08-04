@@ -19,12 +19,20 @@ namespace H4H.Infrastructure.Data.Contexts
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Here you can use Fluent API to configure your models if needed
+            // Ignore Volunteers property in Order
+          
 
             base.OnModelCreating(modelBuilder);
+            //this.ChangeTracker.LazyLoadingEnabled = false;
+
+   
+
+
+         
         }
     }
 }

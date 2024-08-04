@@ -1,6 +1,7 @@
 ﻿using H4H.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -11,28 +12,37 @@ namespace H4H.Domain.Entities
 {
     public class Item : BaseEntity
     {
-        [JsonPropertyName("title")]
-        public string Title { get; set; }
+        [JsonPropertyName("itemId")]
+        public Guid ItemId { get; set; }
+
+        [JsonPropertyName("name")]
+        [Required, MaxLength(100)]
+        public string Name { get; set; }
 
         [JsonPropertyName("description")]
+        [MaxLength(1000)]
         public string Description { get; set; }
 
-        [JsonPropertyName("type")]
-        public ItemType Type { get; set; } // Enum for ToDo, Request, Event
+        //public Guid? AddressId { get; set; }
 
-        // Relationships
-        [JsonPropertyName("organizationId")]
-        public int OrganizationId { get; set; }
-        [ForeignKey("OrganizationId")]
-        public virtual Organization Organization { get; set; }
+        public Address? Address { get; set; }
 
-        [JsonPropertyName("assignedVolunteers")]
-        public virtual ICollection<Volunteer> AssignedVolunteers { get; set; }
+        public Guid? OrderId  { get; set; }
+
+        public Order? Order { get; set; }
+
+        public Guid? UserId { get; set; }   
+
+        public User? User { get; set; }
 
         public Item()
         {
-            AssignedVolunteers = new HashSet<Volunteer>();
+            ItemId = Guid.NewGuid();
+            CreatedDate = DateTime.Now;
+            ModifiedDate = DateTime.Now;
         }
+
     }
+   
 
 }

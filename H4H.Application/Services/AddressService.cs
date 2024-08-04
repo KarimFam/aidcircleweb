@@ -5,86 +5,68 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace H4H.Application.Services
-{
-    public class AddressService : IAddressService
+
+
+    namespace H4H.Application.Services
     {
-        private readonly IAddressRepository _addressRepository;
-        private readonly ILogger<AddressService> _logger;
-
-        public AddressService(IAddressRepository addressRepository, ILogger<AddressService> logger)
+        public class AddressService : IAddressService
         {
-            _addressRepository = addressRepository;
-            _logger = logger;
-        }
+            private readonly IAddressRepository _addressRepository;
 
-        public async Task<IEnumerable<Address>> GetAllAddressesAsync()
-        {
-            try
+            public AddressService(IAddressRepository addressRepository)
+            {
+                _addressRepository = addressRepository;
+            }
+
+            public async Task<IEnumerable<Address>> GetAllAddressesAsync()
             {
                 return await _addressRepository.GetAllAsync();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving addresses");
-                throw;
-            }
-        }
 
-        public async Task<Address> GetAddressByIdAsync(int id)
-        {
-            try
+            public async Task<Address> GetAddressByIdAsync(Guid AddressId) // Change to Guid to match AddressId type
             {
-                return await _addressRepository.GetByIdAsync(id);
+                return await _addressRepository.GetByIdAsync(AddressId);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while retrieving address with ID {id}");
-                throw;
-            }
-        }
 
-        public async Task AddAddressAsync(Address address)
-        {
-            try
+            public async Task AddAddressAsync(Address address)
             {
                 await _addressRepository.AddAsync(address);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while adding a new address");
-                throw;
-            }
-        }
 
-        public async Task UpdateAddressAsync(Address address)
-        {
-            try
+            public async Task UpdateAddressAsync(Address address)
             {
                 await _addressRepository.UpdateAsync(address);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while updating address with ID {address.Id}");
-                throw;
-            }
-        }
 
-        public async Task DeleteAddressAsync(int id)
-        {
-            try
+            public async Task DeleteAddressAsync(Guid AddessId) // Change to Guid to match AddressId type
             {
-                var address = await _addressRepository.GetByIdAsync(id);
+                var address = await _addressRepository.GetByIdAsync(AddessId);
                 if (address != null)
                 {
                     await _addressRepository.DeleteAsync(address);
                 }
             }
-            catch (Exception ex)
+
+            // Additional methods specific to Address operations
+            public async Task<IEnumerable<Address>> GetAddressesByUserIdAsync(Guid UserId)
             {
-                _logger.LogError(ex, $"Error occurred while deleting address with ID {id}");
-                throw;
+                return await _addressRepository.GetAddressByUserIdAsync(UserId);
+            }
+
+            public async Task<IEnumerable<Address>> GetAddressesByOrganizationIdAsync(Guid OrganizationId)
+            {
+                return await _addressRepository.GetAddressByOrganizationIdAsync(OrganizationId);
+            }
+
+            public async Task<IEnumerable<Address>> GetAddressesByItemIdAsync(Guid ItemId)
+            {
+                return await _addressRepository.GetAddressesByItemIdAsync(ItemId);
+            }
+
+            public async Task<IEnumerable<Address>> GetAddressesByOrderIdAsync(Guid OrderId)
+            {
+                return await _addressRepository.GetAddressByOrderIdAsync(OrderId);
             }
         }
     }
-}
+

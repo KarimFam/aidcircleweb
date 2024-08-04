@@ -6,7 +6,7 @@ namespace H4H.Domain.Interfaces
 {
     public interface IOrganizationRepository
     {
-        Task<Organization> GetByIdAsync(int id);
+        Task<Organization> GetByIdAsync(Guid OrganizationId);
         Task<List<Organization>> GetAllAsync();
         Task AddAsync(Organization organization);
         Task UpdateAsync(Organization organization);

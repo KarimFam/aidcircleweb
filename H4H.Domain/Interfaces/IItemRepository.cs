@@ -6,7 +6,7 @@ namespace H4H.Domain.Interfaces
 {
     public interface IItemRepository
     {
-        Task<Item> GetByIdAsync(int id);
+        Task<Item> GetByIdAsync(Guid ItemId);
         Task<List<Item>> GetAllAsync();
         Task AddAsync(Item entity);
         Task UpdateAsync(Item entity);
