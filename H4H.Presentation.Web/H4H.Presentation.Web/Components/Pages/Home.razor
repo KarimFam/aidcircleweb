@@ -1,0 +1,37 @@
+﻿@page "/"
+@using H4H.Application.Interfaces
+@using H4H.Application.Services
+@using H4H.Domain.Entities
+@inject IOrderService  OrderService
+
+<h3>Latest Orders</h3>
+
+@if (orders == null)
+{
+    <p>Loading...</p>
+}
+else if (!orders.Any())
+{
+    <p>No orders have arrived in the past week.</p>
+}
+else
+{
+    <ul>
+        @foreach (var order in orders)
+        {
+            <li>@order.OrderId - @order.CreatedDate - @order.Status</li>
+        }
+    </ul>
+}
+
+@code {
+    
+    private List<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allOrders = await OrderService.GetAllOrdersAsync();
+        var oneWeekAgo = DateTime.Now.AddDays(-7);
+        orders = allOrders.Where(o => o.CreatedDate >= oneWeekAgo).ToList();
+    }
+}

@@ -1,7 +1,7 @@
 // Models/AddressDto.cs
 using System;
 
-namespace H4H.Presentation.API.Data
+namespace H4H.Application.DTOs
 {
     public class AddressDto
     {

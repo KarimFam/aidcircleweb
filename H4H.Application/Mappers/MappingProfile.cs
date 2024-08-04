@@ -1,7 +1,7 @@
 // MappingProfile.cs
 using AutoMapper;
 using H4H.Domain.Entities;
-using H4H.Presentation.API.Data;
+using H4H.Application.DTOs; 
 
 public class MappingProfile : Profile
 {
