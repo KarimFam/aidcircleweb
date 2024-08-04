@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
+using H4H.Presentation.API.Data;
+using System;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace H4H.Presentation.API.Controllers
 {
@@ -10,10 +13,12 @@ namespace H4H.Presentation.API.Controllers
     public class ItemController : ControllerBase
     {
         private readonly IItemService _itemService;
+        private readonly IMapper _mapper;
 
-        public ItemController(IItemService itemService)
+        public ItemController(IItemService itemService, IMapper mapper)
         {
             _itemService = itemService;
+            _mapper = mapper;
         }
 
         // GET: api/item
@@ -21,7 +26,8 @@ namespace H4H.Presentation.API.Controllers
         public async Task<IActionResult> GetAllItems()
         {
             var items = await _itemService.GetAllItemsAsync();
-            return Ok(items);
+            var itemDtos = _mapper.Map<IEnumerable<ItemDto>>(items);
+            return Ok(itemDtos);
         }
 
         // GET: api/item/{ItemId}
@@ -33,31 +39,40 @@ namespace H4H.Presentation.API.Controllers
             {
                 return NotFound($"Item with ID {ItemId} not found.");
             }
-            return Ok(item);
+            var itemDto = _mapper.Map<ItemDto>(item);
+            return Ok(itemDto);
         }
 
         // POST: api/item
         [HttpPost]
-        public async Task<IActionResult> CreateItem([FromBody] Item item)
+        public async Task<IActionResult> CreateItem([FromBody] ItemDto itemDto)
         {
-            if (item == null)
+            if (itemDto == null)
             {
                 return BadRequest("Item is null.");
             }
 
+            var item = _mapper.Map<Item>(itemDto);
             await _itemService.AddItemAsync(item);
-            return CreatedAtAction(nameof(GetItemById), new { ItemId = item.ItemId }, item);
+            return CreatedAtAction(nameof(GetItemById), new { ItemId = item.ItemId }, itemDto);
         }
 
         // PUT: api/item/{ItemId}
         [HttpPut("{ItemId}")]
-        public async Task<IActionResult> UpdateItem(Guid ItemId, [FromBody] Item item)
+        public async Task<IActionResult> UpdateItem(Guid ItemId, [FromBody] ItemDto itemDto)
         {
-            if (item == null || ItemId != item.ItemId)
+            if (itemDto == null)
             {
-                return BadRequest("Item is null or ID mismatch.");
+                return BadRequest("Item is null.");
             }
 
+            var item = await _itemService.GetItemByIdAsync(ItemId);
+            if (item == null)
+            {
+                return NotFound($"Item with ID {ItemId} not found.");
+            }
+
+            _mapper.Map(itemDto, item);
             await _itemService.UpdateItemAsync(item);
             return NoContent();
         }

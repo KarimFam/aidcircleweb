@@ -3,8 +3,10 @@ using H4H.Application.Services;
 using H4H.Domain.Interfaces;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using H4H.Presentation.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,12 +35,14 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 

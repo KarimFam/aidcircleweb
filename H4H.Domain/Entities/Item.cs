@@ -23,48 +23,25 @@ namespace H4H.Domain.Entities
         [MaxLength(1000)]
         public string Description { get; set; }
 
-        //[JsonPropertyName("createdById")]
-        //public int CreatedById { get; set; }
+        //public Guid? AddressId { get; set; }
 
-  //    [JsonPropertyName("createdByType")]
-  //    [Required, MaxLength(50)]
-     // public string CreatedByType { get; set; } // Possible values: "User", "Volunteer", "Organization"
+        public Address? Address { get; set; }
 
-       [JsonPropertyName("addresses")]
-      
-        public virtual ICollection<Address> Addresses { get; set; }
+        public Guid? OrderId  { get; set; }
 
+        public Order? Order { get; set; }
 
+        public Guid? UserId { get; set; }   
 
-        [JsonPropertyName("orderId")]
-        public Guid? OrderId { get; set; }
+        public User? User { get; set; }
 
-
-        [JsonPropertyName("order")]
-     //   [ForeignKey("OrderId")]
-        public virtual Order? Order { get; set; }
-
-        [JsonPropertyName("userId")]
-      
-
-        //[JsonPropertyName("user")]
-    //    [ForeignKey("UserId")]
-    public Guid? UserId { get; set; }
-        public virtual ICollection<User> Users { get; set; }
-
-        [JsonPropertyName("organizationId")]
-        public Guid? OrganizationId { get; set; }
-        
-        public Guid? AddressId { get; set; }
-
-      //  [JsonPropertyName("organization")]
-       // [ForeignKey("OrganizationId")]
-
-        public virtual Organization? Organization { get; set; }
         public Item()
         {
-            Addresses = new HashSet<Address>();
+            ItemId = Guid.NewGuid();
+            CreatedDate = DateTime.Now;
+            ModifiedDate = DateTime.Now;
         }
+
     }
    
 

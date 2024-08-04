@@ -14,7 +14,7 @@ namespace H4H.Domain.Entities
 
         [JsonPropertyName("line2")]
         [MaxLength(255)]
-        public string Line2 { get; set; }
+        public string? Line2 { get; set; }
 
         [JsonPropertyName("city")]
         [Required, MaxLength(100)]
@@ -32,23 +32,25 @@ namespace H4H.Domain.Entities
         [Required, MaxLength(100)]
         public string Country { get; set; }
 
+        public Address()
+        {
+            AddressId = Guid.NewGuid();
+            CreatedDate = DateTime.Now;
+            ModifiedDate = DateTime.Now;
+        }
 
+    
 
+        public Guid? ItemId { get; set; }
+        public Item? Item { get; set; } 
 
         public Guid? UserId { get; set; }
-        // VOLUNTEER  IS HAVING NO REFRENCES WITH ADDRESS (EVERYTHING IS THROUGH USER) public Guid VolunteerId { get; set; }
+        public User? User { get; set; } 
+
         public Guid? OrganizationId { get; set; }
-        public Guid? ItemId { get; set; }
-        public Guid? OrderId { get; set; }
+        public Organization? Organization { get; set; }
 
 
-        public virtual User? User { get; set; }  
-       // public virtual Volunteer Volunteer { get; set; } 
-        public virtual Organization? Organization { get; set; }  
-        public virtual Item? Item { get; set; }  
-        public virtual Order? Order { get; set; }  
-                                                  }
 
-        // [JsonPropertyName("addressableType")]
-        //    public string AddressableType { get; set; } // User, Volunteer, Organization, Item
     }
+}

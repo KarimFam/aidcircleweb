@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace H4H.Infrastructure.Migrations
 {
     [DbContext(typeof(H4HDbContext))]
-    [Migration("20240801023531_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240803170949_initialmigration2")]
+    partial class initialmigration2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,7 +48,6 @@ namespace H4H.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("ItemId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Line1")
@@ -66,13 +65,6 @@ namespace H4H.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("OrganizationId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("PostalCode")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -85,23 +77,11 @@ namespace H4H.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasAnnotation("Relational:JsonPropertyName", "state");
 
-                    b.Property<Guid?>("UserId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("AddressId");
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("Addresses");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "addresses");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
@@ -129,22 +109,9 @@ namespace H4H.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasAnnotation("Relational:JsonPropertyName", "orderId");
-
-                    b.Property<Guid?>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("ItemId");
 
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("OrganizationId");
-
                     b.ToTable("Items");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "items");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Order", b =>
@@ -163,8 +130,6 @@ namespace H4H.Infrastructure.Migrations
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "order");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Organization", b =>
@@ -193,38 +158,6 @@ namespace H4H.Infrastructure.Migrations
                     b.HasKey("OrganizationId");
 
                     b.ToTable("Organizations");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "organizationId");
-                });
-
-            modelBuilder.Entity("ItemUser", b =>
-                {
-                    b.Property<Guid>("ItemsItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ItemsItemId", "UsersUserId");
-
-                    b.HasIndex("UsersUserId");
-
-                    b.ToTable("ItemUser");
-                });
-
-            modelBuilder.Entity("OrderUser", b =>
-                {
-                    b.Property<Guid>("OrdersOrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("OrdersOrderId", "UsersUserId");
-
-                    b.HasIndex("UsersUserId");
-
-                    b.ToTable("OrderUser");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -282,12 +215,6 @@ namespace H4H.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -296,15 +223,11 @@ namespace H4H.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("OrganizationId");
-
                     b.ToTable("Users");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("User");
 
-                    b
-                        .UseTphMappingStrategy()
-                        .HasAnnotation("Relational:JsonPropertyName", "users");
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Volunteer", b =>
@@ -312,7 +235,6 @@ namespace H4H.Infrastructure.Migrations
                     b.HasBaseType("User");
 
                     b.Property<string>("Skills")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "skills");
 
@@ -327,109 +249,12 @@ namespace H4H.Infrastructure.Migrations
                 {
                     b.HasOne("H4H.Domain.Entities.Item", "Item")
                         .WithMany("Addresses")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("H4H.Domain.Entities.Order", "Order")
-                        .WithMany("Addresses")
-                        .HasForeignKey("OrderId");
-
-                    b.HasOne("H4H.Domain.Entities.Organization", "Organization")
-                        .WithMany("Addresses")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", "User")
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ItemId");
 
                     b.Navigation("Item");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
-                {
-                    b.HasOne("H4H.Domain.Entities.Order", "Order")
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId");
-
-                    b.HasOne("H4H.Domain.Entities.Organization", "Organization")
-                        .WithMany("Items")
-                        .HasForeignKey("OrganizationId");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("ItemUser", b =>
-                {
-                    b.HasOne("H4H.Domain.Entities.Item", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("OrderUser", b =>
-                {
-                    b.HasOne("H4H.Domain.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.HasOne("H4H.Domain.Entities.Organization", null)
-                        .WithMany("Users")
-                        .HasForeignKey("OrganizationId");
-                });
-
-            modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
-                {
-                    b.Navigation("Addresses");
-                });
-
-            modelBuilder.Entity("H4H.Domain.Entities.Order", b =>
-                {
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("H4H.Domain.Entities.Organization", b =>
-                {
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Items");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("Addresses");
                 });
