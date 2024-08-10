@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\VolunteersComponent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\H4H.Application\H4H.Application.csproj" />
     <ProjectReference Include="..\..\H4H.Domain\H4H.Domain.csproj" />
     <ProjectReference Include="..\..\H4H.Infrastructure\H4H.Infrastructure.csproj" />
@@ -19,6 +23,18 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\VolunteersComponent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\VolunteersComponent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Components\Pages\VolunteersComponent.razor" />
   </ItemGroup>
 
 </Project>

@@ -25,6 +25,10 @@ namespace H4H.Application.Services
         {
             return await _volunteerRepository.GetByIdAsync(VolunteerId);
         }
+        public async Task<List<Volunteer>> GetOnlineVolunteersAsync()
+        {
+            return await _volunteerRepository.GetOnlineVolunteersAsync();
+        }
 
         public async Task AddVolunteerAsync(Volunteer volunteer)
         {

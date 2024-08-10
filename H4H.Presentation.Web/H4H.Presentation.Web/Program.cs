@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
      .AddInteractiveWebAssemblyComponents();
+builder.Services.AddHttpClient();
+
 
 
 builder.Services.AddDbContext<H4HDbContext>(options =>
@@ -25,6 +27,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+builder.Services.AddScoped<IWeatherService, WeatherService>();
 
 // Repositories
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -33,6 +36,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
+
+// Add HttpClient for WeatherService
+builder.Services.AddHttpClient<IWeatherRepository, WeatherRepository>();
 
 
 var app = builder.Build();
