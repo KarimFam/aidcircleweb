@@ -1,0 +1,36 @@
+﻿@inject IVolunteerService VolunteerService
+
+@if (onlineVolunteers == null)
+{
+    <p>Loading volunteers...</p>
+}
+else if (!onlineVolunteers.Any())
+{
+    <p>No volunteers are currently online.</p>
+}
+else
+{
+    <ul>
+        @foreach (var volunteer in onlineVolunteers)
+        {
+            <li>@volunteer.Username</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Volunteer> onlineVolunteers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            onlineVolunteers = await VolunteerService.GetOnlineVolunteersAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions
+            onlineVolunteers = new List<Volunteer>(); // Initialize to an empty list
+        }
+    }
+}

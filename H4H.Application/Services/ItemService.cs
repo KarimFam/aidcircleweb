@@ -31,6 +31,13 @@ namespace H4H.Application.Services
             await _itemRepository.AddAsync(item);
         }
 
+        public async Task<List<Item>> GetLatestItemsAsync()
+        {
+            var fromDate = DateTime.UtcNow.AddDays(-7);
+            return await _itemRepository.GetLatestItemsAsync(fromDate);
+        }
+
+
         public async Task UpdateItemAsync(Item item)
         {
             await _itemRepository.UpdateAsync(item);

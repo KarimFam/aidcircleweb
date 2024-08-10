@@ -1,71 +1,39 @@
 ﻿@page "/"
-@using H4H.Application.Interfaces
-@using H4H.Application.Services
-@using H4H.Domain.Entities
-@inject IOrderService  OrderService
+@inject IOrderService OrderService
+@inject IItemService ItemService
+@inject IVolunteerService VolunteerService
+@inject IWeatherService WeatherService
+ 
+<h3>Bulletin Board</h3>
 
-<h3>Latest Orders</h3>
-
-@if (orders == null)
-{
-    <p>Loading...</p>
-}
-else if (!orders.Any())
-{
-    <p>No orders have arrived in the past week.</p>
-}
-else
-{
-  <div class="container">
-  <div class="row">
-    <div class="col">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Created Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var order in orders)
-                            {
-                                <tr>
-                                    <td>@order.OrderId</td>
-                                    <td>@order.CreatedDate</td>
-                                    <td>@order.Status</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+<div class="bulletin-board">
+    <div class="board-section">
+        <h4>Latest Orders (Last 7 Days)</h4>
+        <OrdersComponent />
     </div>
-    <div class="col">
-      2 of 4
+    <div class="board-section">
+        <h4>Latest Items (Last 7 Days)</h4>
+        <ItemsComponent />
     </div>
+    <div class="board-section">
+        <h4>Online Volunteers</h4>
+        <VolunteersComponent />
     </div>
-            <div class="row">
-                <div class="col">
-                    3 of 4
-                </div>
-                <div class="col">
-                    4 of 4
-                </div>
-  </div>
+    <div class="board-section">
+        <h4>Local Weather - Tampa, FL</h4>
+        <WeatherComponent />
+    </div>
+</div>
 
-
-        </div>
-}
-
-@code {
-    
-    private List<Order> orders;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var allOrders = await OrderService.GetAllOrdersAsync();
-        var oneWeekAgo = DateTime.Now.AddDays(-7);
-        orders = allOrders.Where(o => o.CreatedDate >= oneWeekAgo).ToList();
+<style>
+    .bulletin-board {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
     }
-}
+    .board-section {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 5px;
+    }
+</style>

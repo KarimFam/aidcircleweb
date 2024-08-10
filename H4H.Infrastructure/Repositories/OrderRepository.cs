@@ -36,6 +36,13 @@ public class OrderRepository : IOrderRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<List<Order>> GetLatestOrdersAsync(DateTime fromDate)
+    {
+        return await _context.Orders
+                             .Where(order => order.CreatedDate >= fromDate)
+                             .ToListAsync();
+    }
+
     public async Task DeleteOrderAsync(Order order)
     {
         _context.Orders.Remove(order);
