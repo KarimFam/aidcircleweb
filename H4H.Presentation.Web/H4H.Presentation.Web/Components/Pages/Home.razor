@@ -1,39 +1,50 @@
 ﻿@page "/"
+
 @inject IOrderService OrderService
 @inject IItemService ItemService
 @inject IVolunteerService VolunteerService
 @inject IWeatherService WeatherService
- 
+
 <h3>Bulletin Board</h3>
 
 <div class="bulletin-board">
-    <div class="board-section">
+    <div class="board-section raised-box">
         <h4>Latest Orders (Last 7 Days)</h4>
         <OrdersComponent />
     </div>
-    <div class="board-section">
+    <div class="board-section raised-box">
         <h4>Latest Items (Last 7 Days)</h4>
         <ItemsComponent />
     </div>
-    <div class="board-section">
+    <div class="board-section raised-box">
         <h4>Online Volunteers</h4>
         <VolunteersComponent />
     </div>
-    <div class="board-section">
+    <div class="board-section raised-box">
         <h4>Local Weather - Tampa, FL</h4>
         <WeatherComponent />
     </div>
 </div>
 
 <style>
+    body {
+        background-color: #E6F0F3; /* New background color */
+    }
     .bulletin-board {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
+        background-color: #E6F0F3; /* Calming color */
     }
     .board-section {
-        border: 1px solid #ccc;
+        border: none;
         padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect */
+        background-color: #FFFFFF; /* White background */
+    }
+    .raised-box {
+        border: 1px solid #ccc;
         border-radius: 5px;
     }
 </style>
