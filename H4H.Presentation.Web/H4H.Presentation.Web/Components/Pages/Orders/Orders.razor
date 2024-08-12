@@ -1,0 +1,52 @@
+﻿@page "/orders"
+@inject IOrderService OrderService
+
+<h3>Orders</h3>
+
+<p>
+    <a href="/orders/create" class="btn btn-primary">Create New Order</a>
+</p>
+
+@if (orders == null)
+{
+    <p>Loading orders...</p>
+}
+else if (!orders.Any())
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Date Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.CreatedDate.ToString("g")</td>
+                    <td>
+                        <a href="@($"/orders/edit/{order.OrderId}")">Edit</a> |
+                        <a href="@($"/orders/details/{order.OrderId}")">Details</a> |
+                        <a href="@($"/orders/delete/{order.OrderId}")">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await OrderService.GetLatestOrdersAsync();
+    }
+}

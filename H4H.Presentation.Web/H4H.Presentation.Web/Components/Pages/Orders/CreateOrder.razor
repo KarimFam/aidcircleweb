@@ -1,0 +1,47 @@
+﻿@page "/orders/create"
+@inject IOrderService OrderService
+@inject IUserService UserService
+@inject NavigationManager Navigation
+
+<h3>Create New Order</h3>
+
+@* <EditForm Model="@order">
+
+    <div class="form-group">
+        <label>Description</label>
+        <InputText class="form-control" @bind-Value="order.OrderId" />
+    </div>
+
+    <div class="form-group">
+        <label>User</label>
+        <InputSelect class="form-control" @bind-Value="order.Users">
+            @foreach (var user in users)
+            {
+                <option value="@user.UserId">@user.Email</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+ *@
+@code {
+
+    private Order order = new Order();
+    private List<User> users;
+    private IEnumerable<User> usersList;
+
+    protected override async Task OnInitializedAsync()
+    {
+       
+
+        usersList = await UserService.GetAllUsersAsync();
+        users = usersList.ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await OrderService.AddOrderAsync(order);
+        Navigation.NavigateTo("/orders");
+    }
+}

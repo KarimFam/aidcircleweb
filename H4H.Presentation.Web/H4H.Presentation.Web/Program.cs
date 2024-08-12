@@ -22,6 +22,11 @@ builder.Services.AddDbContext<H4HDbContext>(options =>
 
 // Services
 builder.Services.AddScoped<IAddressService, AddressService>();
+
+builder.Services.AddMsalAuthentication(options =>
+{
+    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+});
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
