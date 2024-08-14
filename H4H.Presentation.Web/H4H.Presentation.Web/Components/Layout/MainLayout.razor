@@ -1,4 +1,7 @@
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <div class="page">
 @*     <div class="sidebar">
@@ -6,10 +9,23 @@
     </div> *@
 
     <main>
-        <div class="top-row px-4">
+           <div class="top-row px-4 auth">
+@*             <LoginDisplay /> *@
+            <AuthorizeView>
+                <Authorized>
+                    Hello @context.User.Identity?.Name!
+                    <a href="MicrosoftIdentity/Account/SignOut">Log out</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/MicrosoftIdentity/Account/SignIn">Sign in with your social account</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+@*         <div class="top-row px-4 auth">
+            <LoginDisplay /> 
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
-
+ *@
         <article class="content px-4">
             @Body
         </article>

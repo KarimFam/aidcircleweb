@@ -6,15 +6,100 @@ using H4H.Presentation.Web.Components;
 using Microsoft.EntityFrameworkCore;
 using H4H.Application.Services;
 using H4H.Application.Interfaces;
-
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using System.Security.Claims;
+using System.Reflection;
+using System.Linq.Dynamic.Core;
+using Microsoft.Identity.Web.UI;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
-     .AddInteractiveWebAssemblyComponents();
+    .AddMicrosoftIdentityConsentHandler()
+    .AddInteractiveWebAssemblyComponents();
+
 builder.Services.AddHttpClient();
 
+builder.Services.AddControllersWithViews()
+    .AddMicrosoftIdentityUI();
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<HttpContextAccessor>();
+
+//builder.Services.AddMsalAuthentication(options =>
+//{
+//    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+//});
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(options =>
+                {
+                    builder.Configuration.Bind("AzureAdB2C", options);
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnRedirectToIdentityProvider = async ctxt =>
+                        {
+                            // Invoked before redirecting to the identity provider to authenticate. 
+                            // This can be used to set ProtocolMessage.State
+                            // that will be persisted through the authentication process. 
+                            // The ProtocolMessage can also be used to add or customize
+                            // parameters sent to the identity provider.
+                            await Task.Yield();
+                        },
+                        OnAuthenticationFailed = async ctxt =>
+                        {
+                            // They tried to log in but it failed
+                            await Task.Yield();
+                        },
+                        OnSignedOutCallbackRedirect = async ctxt =>
+                        {
+                            ctxt.HttpContext.Response.Redirect(ctxt.Options.SignedOutRedirectUri);
+                            ctxt.HandleResponse();
+                            await Task.Yield();
+                        },
+                        OnTicketReceived = async ctxt =>
+                        {
+                            if (ctxt.Principal != null)
+                            {
+                                if (ctxt.Principal.Identity is ClaimsIdentity identity)
+                                {
+                                    var colClaims = await ctxt.Principal.Claims.ToDynamicListAsync();
+                                    var IdentityProvider = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.microsoft.com/identity/claims/identityprovider")?.Value;
+                                    var Objectidentifier = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                                    var EmailAddress = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+                                    var FirstName = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value;
+                                    var LastName = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value;
+                                    var AzureB2CFlow = colClaims.FirstOrDefault(
+                                        c => c.Type == "http://schemas.microsoft.com/claims/authnclassreference")?.Value;
+                                    var auth_time = colClaims.FirstOrDefault(
+                                        c => c.Type == "auth_time")?.Value;
+                                    var DisplayName = colClaims.FirstOrDefault(
+                                        c => c.Type == "name")?.Value;
+                                    var idp_access_token = colClaims.FirstOrDefault(
+                                        c => c.Type == "idp_access_token")?.Value;
+                                }
+                            }
+                            await Task.Yield();
+                        },
+                    };
+                });
+
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//   .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
+
+
+
+//builder.Services.AddMsalAuthentication(options =>
+//{
+//    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+//});
 
 
 builder.Services.AddDbContext<H4HDbContext>(options =>
@@ -22,11 +107,6 @@ builder.Services.AddDbContext<H4HDbContext>(options =>
 
 // Services
 builder.Services.AddScoped<IAddressService, AddressService>();
-
-builder.Services.AddMsalAuthentication(options =>
-{
-    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-});
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
@@ -64,6 +144,7 @@ else
     app.UseHsts();
 }
 
+//app.UseAuthentication();
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -73,5 +154,9 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(H4H.Presentation.Web.Client._Imports).Assembly);
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

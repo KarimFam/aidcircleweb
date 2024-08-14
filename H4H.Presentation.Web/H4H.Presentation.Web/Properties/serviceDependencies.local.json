@@ -2,6 +2,8 @@
   "dependencies": {
     "identityapp1": {
       "connectionInfo": "App registration: Web-App, Tenant: AidCircle (aidcirclenet.onmicrosoft.com - AAD B2C)",
+      "secretStore": null,
+      "resourceId": null,
       "type": "identityapp.default"
     }
   }
