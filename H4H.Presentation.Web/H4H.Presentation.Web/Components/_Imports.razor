@@ -1,4 +1,4 @@
-﻿@using System.Net.Http
+@using System.Net.Http
 @using System.Net.Http.Json
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -9,8 +9,14 @@
 @using H4H.Presentation.Web
 @using H4H.Presentation.Web.Client
 @using H4H.Presentation.Web.Components
+@using H4H.Infrastructure.Repositories
 @using H4H.Application.Services
 @using H4H.Application.Interfaces
 @using H4H.Domain.Entities
-@using H4H.Infrastructure.Repositories
+@using H4H.Domain.Enums
+@using H4H.Domain.Interfaces
 @using H4H.Infrastructure.Data
+@using Microsoft.Identity.Client
+@using Microsoft.Identity
+@using Microsoft.Identity.Web
+@using Microsoft.AspNetCore.Components.Authorization
