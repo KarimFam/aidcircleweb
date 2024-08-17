@@ -1,6 +1,10 @@
 ﻿@inject IOrderService OrderService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+            
+<AuthorizeView>
 
-@if (latestOrders == null)
+    <Authorized>
+        @if (latestOrders == null)
 {
     <p>Loading orders...</p>
 }
@@ -17,7 +21,8 @@ else
         }
     </ul>
 }
-
+    </Authorized>
+</AuthorizeView>
 @code {
     private List<Order> latestOrders;
 
