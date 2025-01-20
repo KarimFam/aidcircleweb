@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using H4H.Application.Interfaces;
 using H4H.Domain.Entities;
-using H4H.Presentation.API.Data;
+using H4H.Application.DTOs;
 using System;
 using System.Threading.Tasks;
 using AutoMapper;

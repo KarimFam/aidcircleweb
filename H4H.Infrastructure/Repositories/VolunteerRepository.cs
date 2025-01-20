@@ -31,6 +31,13 @@ namespace H4H.Infrastructure.Repositories
             return await _context.Volunteers.ToListAsync();
         }
 
+        public async Task<List<Volunteer>> GetOnlineVolunteersAsync()
+        {
+            return await _context.Volunteers
+                                 .Where(volunteer => volunteer.IsActive)
+                                 .ToListAsync();
+        }
+
         public async Task AddAsync(Volunteer entity)
         {
             await _context.Volunteers.AddAsync(entity);

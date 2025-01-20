@@ -17,7 +17,7 @@ namespace H4H.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.20")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -54,7 +54,6 @@ namespace H4H.Infrastructure.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "line1");
 
                     b.Property<string>("Line2")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasAnnotation("Relational:JsonPropertyName", "line2");
@@ -146,12 +145,11 @@ namespace H4H.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("Status")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "status");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -184,6 +182,36 @@ namespace H4H.Infrastructure.Migrations
                     b.ToTable("Organizations");
                 });
 
+            modelBuilder.Entity("OrderOrganization", b =>
+                {
+                    b.Property<Guid>("OrdersOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrganizationsOrganizationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("OrdersOrderId", "OrganizationsOrganizationId");
+
+                    b.HasIndex("OrganizationsOrganizationId");
+
+                    b.ToTable("OrderOrganization");
+                });
+
+            modelBuilder.Entity("OrderUser", b =>
+                {
+                    b.Property<Guid>("OrdersOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UsersUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("OrdersOrderId", "UsersUserId");
+
+                    b.HasIndex("UsersUserId");
+
+                    b.ToTable("OrderUser");
+                });
+
             modelBuilder.Entity("User", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -200,7 +228,8 @@ namespace H4H.Infrastructure.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -249,7 +278,7 @@ namespace H4H.Infrastructure.Migrations
 
                     b.ToTable("Users");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+                    b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
                 });
@@ -293,7 +322,7 @@ namespace H4H.Infrastructure.Migrations
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
                 {
                     b.HasOne("H4H.Domain.Entities.Order", "Order")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("OrderId");
 
                     b.HasOne("User", "User")
@@ -305,16 +334,44 @@ namespace H4H.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("H4H.Domain.Entities.Order", b =>
+            modelBuilder.Entity("OrderOrganization", b =>
                 {
+                    b.HasOne("H4H.Domain.Entities.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("H4H.Domain.Entities.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationsOrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OrderUser", b =>
+                {
+                    b.HasOne("H4H.Domain.Entities.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId");
+                        .WithMany()
+                        .HasForeignKey("UsersUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
                 {
                     b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("H4H.Domain.Entities.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Organization", b =>
@@ -327,8 +384,6 @@ namespace H4H.Infrastructure.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Items");
-
-                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

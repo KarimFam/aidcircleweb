@@ -26,6 +26,12 @@ namespace H4H.Application.Services
             return await _orderRepository.GetOrderByIdAsync(OrderId);
         }
 
+        public async Task<List<Order>> GetLatestOrdersAsync()
+        {
+            var fromDate = DateTime.UtcNow.AddDays(-7);
+            return await _orderRepository.GetLatestOrdersAsync(fromDate);
+        }
+
         public async Task AddOrderAsync(Order order)
         {
             await _orderRepository.AddOrderAsync(order);

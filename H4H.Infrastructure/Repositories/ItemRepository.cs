@@ -26,6 +26,13 @@ namespace H4H.Infrastructure.Repositories
             return await _context.Items.FindAsync(ItemId);
         }
 
+        public async Task<List<Item>> GetLatestItemsAsync(DateTime fromDate)
+        {
+            return await _context.Items
+                                 .Where(item => item.CreatedDate >= fromDate)
+                                 .ToListAsync();
+        }
+
         public async Task<List<Item>> GetAllAsync()
         {
             return await _context.Items.ToListAsync();
