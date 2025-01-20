@@ -1,0 +1,41 @@
+﻿@inject IOrderService OrderService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+            
+<AuthorizeView>
+
+    <Authorized>
+        @if (latestOrders == null)
+{
+    <p>Loading orders...</p>
+}
+else if (!latestOrders.Any())
+{
+    <p>No orders found in the last 7 days.</p>
+}
+else
+{
+    <ul>
+        @foreach (var order in latestOrders)
+        {
+            <li>@order.OrderId <a href="@($"/order/{order.OrderId}")">View Details</a></li>
+        }
+    </ul>
+}
+    </Authorized>
+</AuthorizeView>
+@code {
+    private List<Order> latestOrders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            latestOrders = await OrderService.GetLatestOrdersAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions, e.g., log or show an error message
+            latestOrders = new List<Order>(); // Initialize to an empty list to prevent null reference issues
+        }
+    }
+}

@@ -1,0 +1,34 @@
+﻿@inject IWeatherService WeatherService
+
+@if (weather == null)
+{
+    <p>Loading weather information...</p>
+}
+else
+{
+    <div>
+        <p>@weather.Description</p>
+        <p>Temperature: @weather.TemperatureCelsius °C</p>
+    </div>
+}
+
+@code {
+    private WeatherInfo weather;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            weather = await WeatherService.GetWeatherAsync("Tampa, FL");
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions
+            weather = new WeatherInfo
+                {
+                    Description = "Unable to retrieve weather data.",
+                    TemperatureCelsius = 0
+                };
+        }
+    }
+}

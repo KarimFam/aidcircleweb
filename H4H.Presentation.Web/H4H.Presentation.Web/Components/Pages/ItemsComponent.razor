@@ -1,0 +1,36 @@
+﻿@inject IItemService ItemService
+
+@if (latestItems == null)
+{
+    <p>Loading items...</p>
+}
+else if (!latestItems.Any())
+{
+    <p>No items found in the last 7 days.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in latestItems)
+        {
+            <li>@item.Name <a href="@($"/item/{item.ItemId}")">View Details</a></li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Item> latestItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            latestItems = await ItemService.GetLatestItemsAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions
+            latestItems = new List<Item>(); // Initialize to an empty list
+        }
+    }
+}

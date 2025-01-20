@@ -1,0 +1,76 @@
+
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+
+<div class="page">
+@*     <div class="sidebar">
+        <NavMenu />
+    </div> *@
+
+    <main>
+           <div class="top-row px-4 auth">
+@*             <LoginDisplay /> *@
+            <AuthorizeView>
+                <Authorized>
+                    Hello @claims.FirstOrDefault(c => c.Type == "emails")!
+                    <a href="MicrosoftIdentity/Account/SignOut">Log out</a>
+
+                    @* @if (claims.Count() > 0)
+                    {
+                        <ul>
+                            @foreach (var claim in claims)
+                            {
+                                <li>@claim.Type: @claim.Value</li>
+                            }
+                        </ul>
+                    } *@
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/MicrosoftIdentity/Account/SignIn">Sign in with your social account</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+@*         <div class="top-row px-4 auth">
+            <LoginDisplay /> 
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+ *@
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+    @code{
+    private string? authMessage;
+    private string? surname;
+    private AuthenticationState _authenticationState;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = _authenticationState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            authMessage = $"{user.Identity.Name} is authenticated.";
+            claims = user.Claims;
+        }
+        else
+        {
+            authMessage = "The user is NOT authenticated.";
+        }
+
+    }
+}
