@@ -12,6 +12,11 @@ using System.Security.Claims;
 using System.Reflection;
 using System.Linq.Dynamic.Core;
 using Microsoft.Identity.Web.UI;
+using Microsoft.AspNetCore.Authorization;
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,22 +25,32 @@ builder.Services.AddRazorComponents()
     .AddMicrosoftIdentityConsentHandler()
     .AddInteractiveWebAssemblyComponents();
 
+//REST Client
 builder.Services.AddHttpClient();
 
+//Identity and Authentication
 builder.Services.AddControllersWithViews()
     .AddMicrosoftIdentityUI();
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<HttpContextAccessor>();
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
-//builder.Services.AddMsalAuthentication(options =>
-//{
-//    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-//});
+builder.Services.AddAuthorization(config =>
+{
+    config.AddPolicy("Volunteer", policy => policy.RequireClaim("IsVolunteer", "true"));
+});
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApp(options =>
                 {
+                    
                     builder.Configuration.Bind("AzureAdB2C", options);
                     options.Events = new OpenIdConnectEvents
                     {
@@ -91,17 +106,9 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     };
                 });
 
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//   .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
 
 
-
-//builder.Services.AddMsalAuthentication(options =>
-//{
-//    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-//});
-
-
+//Database Connection
 builder.Services.AddDbContext<H4HDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
 
