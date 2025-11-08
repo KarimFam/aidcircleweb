@@ -78,7 +78,7 @@ namespace H4H.Application.Services
             await _messageRepository.AddAsync(assistantMessage);
 
             // Update session title if it's the first message
-            if (session.Messages.Count == 2 && session.Title == "New Chat")
+            if (session.Messages.Count >= 2 && session.Title == "New Chat")
             {
                 session.Title = await _orchestrationService.GenerateSessionTitleAsync(message);
                 session.ModifiedDate = DateTime.Now;
