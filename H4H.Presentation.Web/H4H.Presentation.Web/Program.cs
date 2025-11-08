@@ -170,9 +170,11 @@ else
     app.UseHsts();
 }
 
-// Disable HTTPS redirection in development
-// app.UseHttpsRedirection();
-
+// Enable HTTPS redirection except in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseAntiforgery();
 
