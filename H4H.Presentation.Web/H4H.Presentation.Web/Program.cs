@@ -1,4 +1,5 @@
 using H4H.Infrastructure.Repositories;
+using H4H.Infrastructure.Services;
 using H4H.Domain.Interfaces;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Presentation.Web.Client.Pages;
@@ -13,11 +14,30 @@ using System.Reflection;
 using System.Linq.Dynamic.Core;
 using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Azure Key Vault
+var keyVaultName = builder.Configuration["KeyVaultName"];
+if (!string.IsNullOrEmpty(keyVaultName))
+{
+    var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+    
+    // Use DefaultAzureCredential for authentication (supports local dev + Azure)
+    builder.Configuration.AddAzureKeyVault(
+        keyVaultUri,
+        new DefaultAzureCredential()
+    );
+}
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -51,7 +71,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApp(options =>
                 {
                     
-                    builder.Configuration.Bind("AzureAdB2C", options);
+                    builder.Configuration.Bind("AzureAd", options);
                     options.Events = new OpenIdConnectEvents
                     {
                         OnRedirectToIdentityProvider = async ctxt =>
@@ -108,8 +128,8 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
 
 
-//Database Connection
-builder.Services.AddDbContext<H4HDbContext>(options =>
+// Database Connection - Use DbContextPool for improved performance and scalability in high-concurrency scenarios (e.g., Blazor Server, API endpoints)
+builder.Services.AddDbContextPool<H4HDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
 
 // Services
@@ -119,7 +139,11 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-builder.Services.AddScoped<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+
+// AI Services
+builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
+builder.Services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
 // Repositories
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -128,10 +152,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
-
-// Add HttpClient for WeatherService
-builder.Services.AddHttpClient<IWeatherRepository, WeatherRepository>();
+builder.Services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
 
 var app = builder.Build();
@@ -139,9 +161,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-
     app.UseWebAssemblyDebugging();
 }
 else
@@ -151,19 +170,23 @@ else
     app.UseHsts();
 }
 
-//app.UseAuthentication();
-app.UseHttpsRedirection();
-
+// Enable HTTPS redirection except in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+// Authentication MUST come before authorization and MapRazorComponents
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(H4H.Presentation.Web.Client._Imports).Assembly);
 
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

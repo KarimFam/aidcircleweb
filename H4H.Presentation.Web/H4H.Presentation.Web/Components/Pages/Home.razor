@@ -3,7 +3,6 @@
 @inject IOrderService OrderService
 @inject IItemService ItemService
 @inject IVolunteerService VolunteerService
-@inject IWeatherService WeatherService
 
 @attribute [AllowAnonymous]
 
@@ -23,8 +22,9 @@
         <VolunteersComponent />
     </div>
     <div class="board-section raised-box">
-        <h4>Local Weather - Tampa, FL</h4>
-        <WeatherComponent />
+        <h4>AI Chat Assistant</h4>
+        <p>Get help with managing volunteers, orders, and items.</p>
+        <a href="/chat" class="btn btn-primary">Open Chat</a>
     </div>
 </div>
 

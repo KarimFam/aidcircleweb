@@ -3,12 +3,29 @@ using H4H.Application.Services;
 using H4H.Domain.Interfaces;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Infrastructure.Repositories;
+using H4H.Infrastructure.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using H4H.Presentation.API;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Azure Key Vault
+var keyVaultName = builder.Configuration["KeyVaultName"];
+if (!string.IsNullOrEmpty(keyVaultName))
+{
+    var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+    
+    // Use DefaultAzureCredential for authentication (supports local dev + Azure)
+    builder.Configuration.AddAzureKeyVault(
+        keyVaultUri,
+        new DefaultAzureCredential()
+    );
+}
 
 // Add services to the container.
 
@@ -22,7 +39,8 @@ builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
 
 
@@ -33,6 +51,11 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+
+// AI Services
+builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
+builder.Services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
