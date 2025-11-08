@@ -1,0 +1,7 @@
+/* Card Footer Styles */
+
+.ac-card-footer {
+    margin-top: var(--ac-space-md);
+    padding-top: var(--ac-space-md);
+    border-top: 1px solid var(--ac-gray-200);
+}

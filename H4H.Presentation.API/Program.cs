@@ -14,7 +14,17 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Azure Key Vault
+// Load local development secrets (git-ignored file)
+if (builder.Environment.IsDevelopment())
+{
+    var localSettingsPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.Development.Local.json");
+    if (File.Exists(localSettingsPath))
+    {
+        builder.Configuration.AddJsonFile("appsettings.Development.Local.json", optional: true, reloadOnChange: true);
+    }
+}
+
+// Configure Azure Key Vault (for production and local dev with Azure auth)
 var keyVaultName = builder.Configuration["KeyVaultName"];
 if (!string.IsNullOrEmpty(keyVaultName))
 {

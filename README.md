@@ -142,3 +142,78 @@ AidCircle.Solution
 └── AidCircle.Presentation.API (Optional if a separate API is needed)
     ├── Controllers (UserController, OrderController, etc.)
     └── Models (Any API-specific models)
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- .NET 8 SDK
+- SQL Server (local or Azure)
+- Azure CLI (for Key Vault access)
+- Visual Studio 2022 or VS Code
+
+### Quick Start for Developers
+
+1. **Clone the repository**
+   ```powershell
+   git clone https://github.com/KarimFam/aidcircleweb.git
+   cd aidcircleweb
+   ```
+
+2. **Set up local secrets**
+   
+   Follow the complete guide in [LOCAL-DEVELOPMENT-SETUP.md](./LOCAL-DEVELOPMENT-SETUP.md)
+   
+   Quick version:
+   ```powershell
+   # Copy template files
+   Copy-Item "H4H.Presentation.API\appsettings.Development.Local.json.template" "H4H.Presentation.API\appsettings.Development.Local.json"
+   Copy-Item "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json.template" "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json"
+   
+   # Edit the files and add your connection strings and API keys
+   ```
+
+3. **Run database migrations**
+   ```powershell
+   dotnet ef database update --project H4H.Infrastructure --startup-project H4H.Presentation.API
+   ```
+
+4. **Run the application**
+   ```powershell
+   # Terminal 1 - API
+   dotnet run --project H4H.Presentation.API
+   
+   # Terminal 2 - Web
+   dotnet run --project H4H.Presentation.Web/H4H.Presentation.Web
+   ```
+
+### Configuration & Secrets Management
+
+AidCircle uses a secure multi-tier configuration approach:
+
+- **Local Development**: Git-ignored `appsettings.Development.Local.json` files
+- **Production**: Azure Key Vault with Managed Identity
+
+**Important**: Never commit secrets to source control. See:
+- [LOCAL-DEVELOPMENT-SETUP.md](./LOCAL-DEVELOPMENT-SETUP.md) - Complete local setup guide
+- [KEYVAULT-SETUP.md](./KEYVAULT-SETUP.md) - Azure Key Vault configuration
+
+---
+
+## Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Follow the existing code style and architecture
+4. **Never commit `appsettings.Development.Local.json` files**
+5. Submit a pull request
+
+---
+
+## License
+
+[Specify your license here, e.g., MIT, Apache 2.0, etc.]

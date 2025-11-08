@@ -1,0 +1,48 @@
+@* Reusable Card Component *@
+
+<div class="ac-card @CssClass" style="@Style">
+    @if (!string.IsNullOrEmpty(Title) || HeaderContent != null)
+    {
+        <div class="ac-card-header">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <h3 class="ac-card-title">@Title</h3>
+            }
+            @if (HeaderContent != null)
+            {
+                @HeaderContent
+            }
+        </div>
+    }
+    
+    <div class="ac-card-body">
+        @ChildContent
+    </div>
+    
+    @if (FooterContent != null)
+    {
+        <div class="ac-card-footer">
+            @FooterContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+}
