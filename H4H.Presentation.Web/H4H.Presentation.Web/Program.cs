@@ -128,7 +128,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
 
 
-//Database Connection - Use DbContextPool for better concurrency handling in Blazor Server
+// Database Connection - Use DbContextPool for improved performance and scalability in high-concurrency scenarios (e.g., Blazor Server, API endpoints)
 builder.Services.AddDbContextPool<H4HDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
 
