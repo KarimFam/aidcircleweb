@@ -1,7 +1,7 @@
 ﻿@page "/"
-@attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
 
 @inject IOrderService OrderService
 @inject IItemService ItemService
@@ -9,14 +9,16 @@
 
 <PageTitle>Dashboard - AidCircle</PageTitle>
 
-<div class="dashboard-page">
-    <div class="ac-container">
-        <div class="dashboard-header ac-mb-xl">
-            <h1 class="ac-heading-1">Welcome back, @userName!</h1>
-            <p class="ac-text-body">Here's what's happening in your community today.</p>
-        </div>
+<AuthorizeView>
+    <Authorized>
+        <div class="dashboard-page">
+            <div class="ac-container">
+                <div class="dashboard-header ac-mb-xl">
+                    <h1 class="ac-heading-1">Welcome back, @userName!</h1>
+                    <p class="ac-text-body">Here's what's happening in your community today.</p>
+                </div>
 
-        @if (isLoading)
+                @if (isLoading)
         {
             <LoadingSpinner Message="Loading your dashboard..." />
         }
@@ -109,6 +111,14 @@
         }
     </div>
 </div>
+    </Authorized>
+    <NotAuthorized>
+        @{
+            // Redirect to welcome page for unauthenticated users
+            Navigation.NavigateTo("/welcome", forceLoad: false);
+        }
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     [CascadingParameter]

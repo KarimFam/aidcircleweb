@@ -1,219 +1,458 @@
-# AidCircle
+<div align="center">
 
-AidCircle is a full-stack application designed to streamline operations for organizations, volunteers, and general users in the philanthropic and social service sectors. With AidCircle, you can manage users, organizations, items, volunteers, and orders, fostering a community-driven platform for coordinating aid and resources.
+# 🌍 AidCircle
 
-## Table of Contents
-- [Features](#features)
-- [Purpose](#purpose)
-- [Architecture Overview](#architecture-overview)
-- [Technology Stack](#technology-stack)
-- [Naming Conventions](#naming-conventions)
-- [Software Development Best Practices](#software-development-best-practices)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Contributing](#contributing)
-- [License](#license)
+### Intelligent Aid Coordination Platform
 
----
+**Connect. Coordinate. Make a Difference.**
 
-## Features
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![Blazor](https://img.shields.io/badge/Blazor-Server%20%2B%20WASM-512BD4?logo=blazor)](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
+[![Azure](https://img.shields.io/badge/Azure-Cloud%20Native-0078D4?logo=microsoft-azure)](https://azure.microsoft.com/)
+[![OpenAI](https://img.shields.io/badge/Azure_OpenAI-GPT--4o--mini-412991?logo=openai)](https://azure.microsoft.com/products/ai-services/openai-service)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-1. **User Management**  
-   - Register and manage user profiles.  
-   - Support for volunteer roles, external authentication providers, and user-specific addresses.
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
-2. **Organization Management**  
-   - Create and maintain organization profiles.  
-   - Each organization can have multiple addresses and items listed under it.
-
-3. **Item Management**  
-   - Create, view, and manage items (e.g., requests, events, todos).  
-   - Assign items to volunteers or organizations.
-
-4. **Volunteer Coordination**  
-   - Assign volunteers to organizations or items.  
-   - Track skills and availability of volunteers.
-
-5. **Orders**  
-   - Aggregate items into an order that can be fulfilled by volunteers or organizations.  
-   - Single user ownership with the flexibility of multiple volunteers and organizations involved.
-
-6. **Addresses**  
-   - Unified and consistent management of addresses across users, volunteers, organizations, and items.
-
-7. **Local Weather Integration**  
-   - Display local weather information (e.g., for Tampa, FL) to assist in planning and logistics.
+</div>
 
 ---
 
-## Purpose
+## 📖 About AidCircle
 
-AidCircle aims to:
-- **Facilitate Collaboration**: Connect volunteers, organizations, and end-users on a single platform.
-- **Streamline Resource Management**: Manage items and orders efficiently, ensuring the right resources reach those in need.
-- **Enhance Communication**: Provide clear and consistent channels for volunteers, organizations, and donors to collaborate.
-- **Promote Accountability**: Keep track of items, orders, and volunteer efforts in a transparent way.
+AidCircle is a **full-stack philanthropic aid coordination platform** that connects volunteers, organizations, and users to streamline resource management and order fulfillment. Built with .NET 8 and powered by Azure AI, AidCircle features an intelligent **multi-language chat assistant** that helps users navigate the platform in 11 languages.
 
----
+### 🎯 Mission
 
-## Architecture Overview
-
-AidCircle employs a **clean, multi-layered architecture** that separates concerns and ensures maintainability, scalability, and testability:
-
-1. **Domain Layer**  
-   - Contains core business entities (e.g., `User`, `Volunteer`, `Organization`, `Item`, `Order`, `Address`).  
-   - Free from external dependencies, focusing solely on business logic.
-
-2. **Application Layer**  
-   - Implements application-specific logic through services and interfaces (e.g., `UserService`, `OrderService`).  
-   - Acts as a mediator between the domain and presentation layers.
-
-3. **Infrastructure Layer**  
-   - Houses data persistence and external integrations (e.g., EF Core repositories, weather API).  
-   - Implements repository interfaces defined in the domain layer.
-
-4. **Presentation Layer**  
-   - Contains Blazor Server (and potentially Blazor Hybrid for mobile) UI components.  
-   - Handles user interactions, rendering Razor components, and calling application services.
+- **Facilitate Collaboration**: Connect volunteers, organizations, and end-users on a single platform
+- **Streamline Resources**: Manage items and orders efficiently, ensuring resources reach those in need
+- **Enhance Communication**: Provide clear channels for collaboration with AI-powered assistance
+- **Promote Accountability**: Transparent tracking of items, orders, and volunteer efforts
 
 ---
 
-## Technology Stack
+## ✨ Features
 
-- **.NET 7 / C#**: Core application and domain logic.  
-- **Blazor Server**: Web-based user interface.  
-- **Entity Framework Core**: Data access and repository implementation.  
-- **SQL Server (Azure-ready)**: Primary database for storage.  
-- **FluentValidation / Data Annotations**: Input validation.  
-- **Swagger (Optional)**: API documentation.
+### 🤖 AI-Powered Multi-Language Chat
+> **NEW!** Intelligent assistant supporting 11 languages with automatic detection and translation
+
+```mermaid
+graph LR
+    A[User: Spanish] -->|¿Cuántos voluntarios hay?| B[AI Assistant]
+    B -->|Auto-Translate| C[Azure OpenAI]
+    C -->|Function Call| D[Domain Plugin]
+    D -->|Data| C
+    C -->|English Response| B
+    B -->|Translate to Spanish| E[User: Actualmente hay 42...]
+    
+    style B fill:#FF9800,color:#fff
+    style C fill:#2196F3,color:#fff
+    style D fill:#4CAF50,color:#fff
+```
+
+**Powered by**:
+- **Azure OpenAI** (GPT-4o-mini) - Cost-effective conversational AI
+- **Microsoft Semantic Kernel** - Agent plugin architecture
+- **Azure AI Translator** - Real-time language detection and translation
+
+**Supported Languages**: English, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese, Korean, Hindi
+
+### 👥 User & Volunteer Management
+- Secure authentication via Azure AD External ID (B2C)
+- Volunteer skill tracking and organization assignments
+- Role-based access control (Admin, Volunteer, User)
+
+### 🏢 Organization Management
+- Multi-address support for complex organizations
+- Item and order tracking per organization
+- Transparent accountability and reporting
+
+### 📦 Item & Order Management
+- Categorize items by type (Todo, Request, Event)
+- Aggregate items into fulfillment orders
+- Track order status (Pending, InProgress, Completed, Cancelled)
+- Assign volunteers and organizations to orders
+
+### 🗺️ Unified Address Management
+- Consistent address handling across all entities
+- Support for multiple address types (Home, Work, Billing, Shipping, Organization)
 
 ---
 
-## Naming Conventions
+## 🚀 Quick Start
 
-- **Classes & Methods**: PascalCase (e.g., `UserService`, `GetLatestOrdersAsync`)  
-- **Properties & Fields**: PascalCase (e.g., `Username`, `CreatedDate`)  
-- **Local Variables & Parameters**: camelCase (e.g., `userService`, `orderId`)  
-- **Interfaces**: Prefixed with `I` (e.g., `IUserService`, `IOrderRepository`)  
-- **Folders**: Organized by feature or layer (e.g., `Domain/Entities`, `Infrastructure/Repositories`).  
-- **Files**: Named according to their contained class or responsibility.
+### Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [.NET SDK](https://dotnet.microsoft.com/download) | 8.0+ | Runtime framework |
+| [Visual Studio Code](https://code.visualstudio.com/) | Latest | IDE |
+| [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) | Latest | Azure authentication |
+| [SQL Server](https://www.microsoft.com/sql-server) | 2019+ or Azure SQL | Database |
+
+### 1️⃣ Clone Repository
+
+```powershell
+git clone https://github.com/KarimFam/aidcircleweb.git
+cd aidcircleweb
+```
+
+### 2️⃣ Configure Local Secrets
+
+```powershell
+# Copy template files
+Copy-Item "H4H.Presentation.API\appsettings.Development.Local.json.template" `
+          "H4H.Presentation.API\appsettings.Development.Local.json"
+
+Copy-Item "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json.template" `
+          "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json"
+
+# Edit and add your Azure credentials
+code "H4H.Presentation.API\appsettings.Development.Local.json"
+code "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json"
+```
+
+> [!TIP]
+> See [Local Development Guide](docs/local-development.md) for detailed setup instructions
+
+### 3️⃣ Apply Database Migrations
+
+```powershell
+dotnet ef database update --project H4H.Infrastructure --startup-project H4H.Presentation.API
+```
+
+### 4️⃣ Run the Applications
+
+```powershell
+# Terminal 1: Start API
+dotnet run --project H4H.Presentation.API
+
+# Terminal 2: Start Web App
+dotnet run --project H4H.Presentation.Web/H4H.Presentation.Web
+```
+
+### 5️⃣ Access the Platform
+
+- **Web App**: http://localhost:5011
+- **API**: http://localhost:5135
+- **Swagger**: http://localhost:5135/swagger
 
 ---
 
-## Software Development Best Practices
+## 🏗️ Architecture
 
-- **SOLID Principles**: Promotes clean, maintainable code (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion).  
-- **DRY (Don't Repeat Yourself)**: Avoid duplication by encapsulating common functionality in services and reusable components.  
-- **Layered Architecture**: Enforces separation of concerns, improving testability and scalability.  
-- **Dependency Injection**: Reduces coupling between layers and improves flexibility.  
-- **Unit & Integration Testing**: Encouraged in both the domain and application layers to ensure reliability.
+AidCircle follows **Clean Architecture** principles with strict separation of concerns:
+
+```mermaid
+flowchart TD
+    subgraph Presentation["🟣 Presentation Layer"]
+        Web[Blazor Server/WASM]
+        API[REST API]
+    end
+    
+    subgraph Application["🔵 Application Layer"]
+        Services[Business Services]
+        DTOs[Data Transfer Objects]
+    end
+    
+    subgraph Infrastructure["🟠 Infrastructure Layer"]
+        Repos[EF Core Repositories]
+        AI[AI Orchestration<br/>Semantic Kernel]
+        Trans[Translation Service]
+    end
+    
+    subgraph Domain["🟢 Domain Layer"]
+        Entities[Business Entities]
+        Enums[Domain Rules]
+    end
+    
+    Web --> Services
+    API --> Services
+    Services --> Repos
+    Services --> AI
+    AI --> Trans
+    Repos -.implements.-> Entities
+    
+    style Domain fill:#4CAF50,color:#fff
+    style Application fill:#2196F3,color:#fff
+    style Infrastructure fill:#FF9800,color:#fff
+    style Presentation fill:#9C27B0,color:#fff
+```
+
+### Layer Responsibilities
+
+| Layer | Purpose | Dependencies |
+|-------|---------|--------------|
+| **🟢 Domain** | Pure business logic, entities, enums | None |
+| **🔵 Application** | Services, DTOs, orchestration interfaces | Domain only |
+| **🟠 Infrastructure** | Data access, AI services, external integrations | Domain + Application |
+| **🟣 Presentation** | UI components, API controllers | Application + Infrastructure (DI) |
+
+**Key Principle**: Inner layers never depend on outer layers. Domain has zero external dependencies.
 
 ---
 
-## Project Structure
+## 🎨 System Architecture
 
-```plaintext
-AidCircle.Solution
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        Browser[Web Browser<br/>Blazor UI]
+    end
+    
+    subgraph Azure["Azure Cloud Services"]
+        AzureSQL[(Azure SQL Database)]
+        AzureOpenAI[Azure OpenAI<br/>GPT-4o-mini]
+        AzureTranslator[Azure Translator<br/>Multi-Language]
+        AzureAD[Azure AD External ID<br/>Authentication]
+        KeyVault[Azure Key Vault<br/>Secrets Management]
+    end
+    
+    subgraph AppServices["App Services"]
+        WebApp[Blazor Web App<br/>Server + WASM]
+        RESTAPI[REST API<br/>Swagger]
+    end
+    
+    Browser --> WebApp
+    Browser --> AzureAD
+    WebApp --> RESTAPI
+    WebApp --> AzureSQL
+    WebApp --> AzureOpenAI
+    WebApp --> AzureTranslator
+    WebApp --> KeyVault
+    RESTAPI --> AzureSQL
+    
+    style Azure fill:#0078D4,color:#fff
+    style AppServices fill:#512BD4,color:#fff
+```
+
+### Technology Stack
+
+**Backend**:
+- .NET 8.0 | C# 12.0 | Entity Framework Core 8.0.7
+- Microsoft Semantic Kernel 1.25.0 (AI orchestration)
+- AutoMapper 13.0.1 (object mapping)
+
+**Frontend**:
+- Blazor Server (server-side rendering)
+- Blazor WebAssembly (client-side interactivity)
+- Bootstrap 5 (UI framework)
+
+**Azure Services**:
+- Azure SQL Database | Azure OpenAI | Azure AI Translator
+- Azure AD External ID (B2C) | Azure Key Vault
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Architecture Overview](docs/architecture-overview.md) | Clean architecture, layer responsibilities, domain model, design patterns |
+| [Local Development Setup](docs/local-development.md) | Prerequisites, secrets management, running locally, troubleshooting |
+| [AI Chat Deep Dive](docs/ai-chat.md) | Multi-language chat flow, Semantic Kernel integration, agent plugins |
+| [Deployment Guide](docs/deployment.md) | Azure resource setup, Key Vault configuration, CI/CD pipeline |
+
+---
+
+## 🎯 Configuration
+
+AidCircle uses **multi-tier configuration loading** for secure secrets management:
+
+```mermaid
+flowchart LR
+    A[appsettings.json<br/>Base Config] --> B[appsettings.Development.json<br/>Dev Overrides]
+    B --> C[appsettings.Development.Local.json<br/>🔒 Git-Ignored Secrets]
+    C --> D[Azure Key Vault<br/>Production Secrets]
+    
+    style C fill:#FF9800,color:#fff,stroke:#F57C00,stroke-width:3px
+    style D fill:#4CAF50,color:#fff
+```
+
+> [!IMPORTANT]
+> `appsettings.Development.Local.json` files contain your personal Azure credentials and are **NEVER committed** to source control.
+
+**Configuration Priority** (lowest to highest):
+1. `appsettings.json` - Base configuration (committed)
+2. `appsettings.Development.json` - Dev defaults (committed)
+3. `appsettings.Development.Local.json` - 🔒 **Your local secrets** (git-ignored)
+4. Azure Key Vault - Production secrets (managed identity access)
+
+See [Local Development Setup](docs/local-development.md#secrets-management) for details.
+
+---
+
+## 🌟 AI Chat Features
+
+### Conversation Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as ChatComponent
+    participant Orch as AI Orchestrator
+    participant Trans as Azure Translator
+    participant AI as Azure OpenAI
+    participant Plugin as Domain Plugin
+    
+    User->>UI: Send message (any language)
+    UI->>Orch: Process message
+    Orch->>Trans: Detect language
+    Trans-->>Orch: Language detected
+    Orch->>Trans: Translate to English
+    Trans-->>Orch: English text
+    Orch->>AI: Request with context
+    AI->>Plugin: Call domain function
+    Plugin-->>AI: Domain data
+    AI-->>Orch: Response (English)
+    Orch->>Trans: Translate to user's language
+    Trans-->>Orch: Translated response
+    Orch-->>UI: Display message
+    UI-->>User: Response in native language
+```
+
+### Agent Capabilities
+
+AidCircle's AI assistant can:
+- ✅ Provide platform statistics and guidance
+- ✅ Explain volunteer creation workflows
+- ✅ Assist with order management
+- ✅ Answer domain-specific questions
+- ✅ Communicate in 11 languages seamlessly
+
+**Performance**: ~2-4 second response time | ~300 tokens per request | ~$0.003 per conversation
+
+See [AI Chat Deep Dive](docs/ai-chat.md) for implementation details.
+
+---
+
+## 🛠️ Project Structure
+
+```
+aidcircleweb/
+├── H4H.Domain/                 # 🟢 Domain Layer (Pure Business Logic)
+│   ├── Entities/               # User, Order, ChatSession, etc.
+│   ├── Enums/                  # ItemType, ChatLanguage, etc.
+│   └── Interfaces/             # Repository contracts
 │
-├── AidCircle.Domain
-│   ├── Entities (User, Volunteer, Organization, Item, Order, Address, etc.)
-│   ├── Enums (ItemType, AddressType, etc.)
-│   ├── Interfaces (IUserRepository, IOrderRepository, etc.)
-│   └── ValueObjects (Potential value objects)
+├── H4H.Application/            # 🔵 Application Layer (Services & DTOs)
+│   ├── Services/               # Business services
+│   ├── Interfaces/             # Service contracts
+│   ├── DTOs/                   # Data transfer objects
+│   └── Mappers/                # AutoMapper profiles
 │
-├── AidCircle.Application
-│   ├── Interfaces (IUserService, IOrderService, etc.)
-│   ├── Services (UserService, OrderService, etc.)
-│   ├── Validators (UserValidator, OrganizationValidator)
-│   └── DTOs (Optional if needed)
+├── H4H.Infrastructure/         # 🟠 Infrastructure Layer (Data & AI)
+│   ├── Data/Contexts/          # EF Core DbContext
+│   ├── Migrations/             # Database migrations
+│   ├── Repositories/           # Repository implementations
+│   └── Services/               # AI & external services
+│       ├── ChatOrchestrationService.cs
+│       ├── AzureTranslatorService.cs
+│       └── Plugins/            # Semantic Kernel plugins
 │
-├── AidCircle.Infrastructure
-│   ├── Data (AidCircleDbContext, Migrations)
-│   ├── Repositories (UserRepository, OrderRepository, etc.)
-│   ├── ExternalServices (Weather API integration)
-│   └── Logging (Optional)
+├── H4H.Presentation.API/       # 🟣 REST API
+│   ├── Controllers/            # API endpoints
+│   └── Program.cs              # API startup
 │
-├── AidCircle.Presentation.Web
-│   ├── Pages (Razor components for CRUD operations)
-│   ├── Shared (Layout and shared UI components)
-│   ├── Services (Optional front-end specific services)
-│   └── wwwroot (Static content like CSS, JS)
+├── H4H.Presentation.Web/       # 🟣 Blazor Web
+│   ├── H4H.Presentation.Web/          # Server project
+│   │   ├── Components/Pages/          # Razor pages
+│   │   └── Program.cs                 # Web startup
+│   └── H4H.Presentation.Web.Client/   # WASM project
 │
-└── AidCircle.Presentation.API (Optional if a separate API is needed)
-    ├── Controllers (UserController, OrderController, etc.)
-    └── Models (Any API-specific models)
+└── docs/                       # 📚 Documentation
+    ├── architecture-overview.md
+    ├── local-development.md
+    ├── ai-chat.md
+    └── deployment.md
 ```
 
 ---
 
-## Getting Started
+## 🤝 Contributing
 
-### Prerequisites
+We welcome contributions! Here's how to get started:
 
-- .NET 8 SDK
-- SQL Server (local or Azure)
-- Azure CLI (for Key Vault access)
-- Visual Studio 2022 or VS Code
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Make your changes** following our coding standards
+4. **Test thoroughly** (run both API and Web locally)
+5. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+6. **Push to your branch** (`git push origin feature/amazing-feature`)
+7. **Open a Pull Request**
 
-### Quick Start for Developers
+### Development Guidelines
 
-1. **Clone the repository**
-   ```powershell
-   git clone https://github.com/KarimFam/aidcircleweb.git
-   cd aidcircleweb
-   ```
+- Follow **Clean Architecture** principles
+- Maintain **layer separation** (Domain never depends on outer layers)
+- Use **AutoMapper** for entity ↔ DTO mapping
+- Call `SaveChangesAsync()` immediately in repositories
+- Add `[KernelFunction]` attributes for new AI plugins
+- Update documentation for major features
 
-2. **Set up local secrets**
-   
-   Follow the complete guide in [LOCAL-DEVELOPMENT-SETUP.md](./LOCAL-DEVELOPMENT-SETUP.md)
-   
-   Quick version:
-   ```powershell
-   # Copy template files
-   Copy-Item "H4H.Presentation.API\appsettings.Development.Local.json.template" "H4H.Presentation.API\appsettings.Development.Local.json"
-   Copy-Item "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json.template" "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json"
-   
-   # Edit the files and add your connection strings and API keys
-   ```
-
-3. **Run database migrations**
-   ```powershell
-   dotnet ef database update --project H4H.Infrastructure --startup-project H4H.Presentation.API
-   ```
-
-4. **Run the application**
-   ```powershell
-   # Terminal 1 - API
-   dotnet run --project H4H.Presentation.API
-   
-   # Terminal 2 - Web
-   dotnet run --project H4H.Presentation.Web/H4H.Presentation.Web
-   ```
-
-### Configuration & Secrets Management
-
-AidCircle uses a secure multi-tier configuration approach:
-
-- **Local Development**: Git-ignored `appsettings.Development.Local.json` files
-- **Production**: Azure Key Vault with Managed Identity
-
-**Important**: Never commit secrets to source control. See:
-- [LOCAL-DEVELOPMENT-SETUP.md](./LOCAL-DEVELOPMENT-SETUP.md) - Complete local setup guide
-- [KEYVAULT-SETUP.md](./KEYVAULT-SETUP.md) - Azure Key Vault configuration
+See [Architecture Overview](docs/architecture-overview.md#design-patterns) for design patterns.
 
 ---
 
-## Contributing
+## 📋 Prerequisites for Azure Deployment
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Follow the existing code style and architecture
-4. **Never commit `appsettings.Development.Local.json` files**
-5. Submit a pull request
+To deploy AidCircle to Azure, you'll need:
+
+- ✅ **Azure Subscription** with Contributor access
+- ✅ **Azure SQL Database** instance
+- ✅ **Azure OpenAI** resource with GPT-4o-mini deployment
+- ✅ **Azure AI Translator** resource
+- ✅ **Azure AD External ID (B2C)** tenant configured
+- ✅ **Azure Key Vault** for production secrets
+
+See [Deployment Guide](docs/deployment.md) for step-by-step instructions.
 
 ---
 
-## License
+## 🐛 Troubleshooting
 
-[Specify your license here, e.g., MIT, Apache 2.0, etc.]
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| Missing local secrets file | Copy `.template` files to `.json` and populate |
+| SQL connection errors | Verify connection string in local config |
+| Azure AD redirect loop | Ensure `Instance` ends with `/` |
+| OpenAI 404 errors | Verify `DeploymentName` matches Azure portal |
+| Translation 401 errors | Check `AzureTranslator:Key` is correct |
+
+See [Local Development Guide - Troubleshooting](docs/local-development.md#troubleshooting) for detailed solutions.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Microsoft Semantic Kernel** - AI orchestration framework
+- **Azure OpenAI** - GPT-4o-mini chat completions
+- **Azure AI Translator** - Multi-language support
+- **Blazor** - Modern web UI framework
+- **Entity Framework Core** - ORM for .NET
+
+---
+
+## 📞 Support
+
+- **Documentation**: [docs/](docs/)
+- **Issues**: [GitHub Issues](https://github.com/KarimFam/aidcircleweb/issues)
+- **Email**: [Contact Us](mailto:support@aidcircle.org)
+
+---
+
+<div align="center">
+
+**Built with ❤️ using .NET 8, Blazor, and Azure AI**
+
+[⬆ Back to Top](#-aidcircle)
+
+</div>

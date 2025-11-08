@@ -100,9 +100,25 @@ namespace H4H.Infrastructure.Services
                 );
 
                 var responseContent = result.Content ?? "I'm sorry, I couldn't generate a response.";
-                var tokensUsed = result.Metadata?.ContainsKey("Usage") == true 
-                    ? (int?)((dynamic?)result.Metadata["Usage"])?.TotalTokens ?? 0
-                    : 0;
+                
+                // Extract token usage from metadata
+                var tokensUsed = 0;
+                if (result.Metadata?.ContainsKey("Usage") == true)
+                {
+                    var usage = result.Metadata["Usage"];
+                    if (usage != null)
+                    {
+                        // Try different property names depending on SDK version
+                        var usageDict = usage as IDictionary<string, object>;
+                        if (usageDict != null)
+                        {
+                            if (usageDict.ContainsKey("TotalTokenCount"))
+                                tokensUsed = Convert.ToInt32(usageDict["TotalTokenCount"]);
+                            else if (usageDict.ContainsKey("total_tokens"))
+                                tokensUsed = Convert.ToInt32(usageDict["total_tokens"]);
+                        }
+                    }
+                }
 
                 // Step 4: Translate response back to user's preferred language if needed
                 var finalResponse = responseContent;
