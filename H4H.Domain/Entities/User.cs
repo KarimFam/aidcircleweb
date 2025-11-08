@@ -34,11 +34,11 @@ public class User : BaseEntity
     public bool IsActive { get; set; }
 
     [JsonPropertyName("externalAuthProvider")]
-    [MaxLength(50)]
+    [MaxLength(100)]
     public string ExternalAuthProvider { get; set; }
 
     [JsonPropertyName("externalAuthId")]
-    [MaxLength(255)]
+    [MaxLength(500)]
     public string ExternalAuthId { get; set; }
 
     public List<Item> Items { get; set; }

@@ -1,0 +1,27 @@
+@* Loading Spinner Component *@
+
+<div class="loading-spinner-container @(Fullscreen ? "fullscreen" : "")">
+    <div class="ac-spinner @SizeClass"></div>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="spinner-message">@Message</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public string Size { get; set; } = "medium"; // small, medium, large
+
+    [Parameter]
+    public bool Fullscreen { get; set; } = false;
+
+    private string SizeClass => Size.ToLower() switch
+    {
+        "small" => "ac-spinner-sm",
+        "large" => "ac-spinner-lg",
+        _ => ""
+    };
+}

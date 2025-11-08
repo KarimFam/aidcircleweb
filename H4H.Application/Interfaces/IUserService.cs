@@ -8,6 +8,7 @@ namespace H4H.Application.Interfaces
     {
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> GetUserByIdAsync(Guid UserId);
+        Task<User?> GetByExternalAuthIdAsync(string externalAuthId);
         Task AddUserAsync(User user);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(Guid UserId);

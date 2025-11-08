@@ -1,6 +1,7 @@
 using H4H.Infrastructure.Repositories;
 using H4H.Infrastructure.Services;
 using H4H.Domain.Interfaces;
+using H4H.Domain.Entities;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Presentation.Web.Client.Pages;
 using H4H.Presentation.Web.Components;
@@ -23,7 +24,17 @@ using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Azure Key Vault
+// Load local development secrets (git-ignored file)
+if (builder.Environment.IsDevelopment())
+{
+    var localSettingsPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.Development.Local.json");
+    if (File.Exists(localSettingsPath))
+    {
+        builder.Configuration.AddJsonFile("appsettings.Development.Local.json", optional: true, reloadOnChange: true);
+    }
+}
+
+// Configure Azure Key Vault (for production and local dev with Azure auth)
 var keyVaultName = builder.Configuration["KeyVaultName"];
 if (!string.IsNullOrEmpty(keyVaultName))
 {
@@ -55,13 +66,9 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnCh
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<HttpContextAccessor>();
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
 
+// Remove global authentication requirement - allow public pages
+// Individual pages use [Authorize] attribute as needed
 builder.Services.AddAuthorization(config =>
 {
     config.AddPolicy("Volunteer", policy => policy.RequireClaim("IsVolunteer", "true"));
@@ -119,6 +126,37 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                                         c => c.Type == "name")?.Value;
                                     var idp_access_token = colClaims.FirstOrDefault(
                                         c => c.Type == "idp_access_token")?.Value;
+
+                                    // Auto-create user in database if doesn't exist
+                                    if (!string.IsNullOrEmpty(Objectidentifier))
+                                    {
+                                        var userService = ctxt.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                                        var existingUser = await userService.GetByExternalAuthIdAsync(Objectidentifier);
+                                        
+                                        if (existingUser == null)
+                                        {
+                                            // Create new user
+                                            var newUser = new User
+                                            {
+                                                UserId = Guid.NewGuid(),
+                                                ExternalAuthId = Objectidentifier,
+                                                ExternalAuthProvider = "AzureAD", // Simplified instead of full URL
+                                                Email = EmailAddress ?? $"{Objectidentifier}@placeholder.com",
+                                                FirstName = FirstName ?? "User",
+                                                LastName = LastName ?? "",
+                                                Username = DisplayName ?? EmailAddress ?? Objectidentifier,
+                                                IsActive = true,
+                                                DateOfBirth = DateTime.Now.AddYears(-25), // Default placeholder
+                                                CreatedDate = DateTime.Now,
+                                                ModifiedDate = DateTime.Now,
+                                                Addresses = new List<Address>(),
+                                                Items = new List<Item>(),
+                                                Orders = new List<Order>()
+                                            };
+                                            
+                                            await userService.AddUserAsync(newUser);
+                                        }
+                                    }
                                 }
                             }
                             await Task.Yield();
@@ -130,7 +168,15 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
 // Database Connection - Use DbContextPool for improved performance and scalability in high-concurrency scenarios (e.g., Blazor Server, API endpoints)
 builder.Services.AddDbContextPool<H4HDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("H4HDB-DEV"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 
 // Services
 builder.Services.AddScoped<IAddressService, AddressService>();

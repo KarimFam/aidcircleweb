@@ -52,20 +52,44 @@ az keyvault secret set --vault-name aidcirclekeyvault --name "AzureTranslator--K
 
 ## Local Development Setup
 
-### Option 1: Azure CLI Authentication (Recommended)
+### ⭐ Option 1: appsettings.Development.Local.json (Recommended for Team)
+
+**This is the easiest and most common approach for local development.**
+
+1. Copy the template files:
+   ```powershell
+   # For API
+   Copy-Item "H4H.Presentation.API\appsettings.Development.Local.json.template" "H4H.Presentation.API\appsettings.Development.Local.json"
+   
+   # For Web
+   Copy-Item "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json.template" "H4H.Presentation.Web\H4H.Presentation.Web\appsettings.Development.Local.json"
+   ```
+
+2. Edit the files and replace placeholders with your actual secrets
+
+3. **These files are git-ignored** - they will never be committed to source control
+
+See [LOCAL-DEVELOPMENT-SETUP.md](./LOCAL-DEVELOPMENT-SETUP.md) for complete instructions.
+
+### Option 2: Azure CLI Authentication (for Key Vault Testing)
+
+If you want to test Key Vault integration locally instead of using local files:
 
 1. Install Azure CLI: https://docs.microsoft.com/cli/azure/install-azure-cli
 2. Login to Azure: `az login`
 3. The application will automatically use your Azure CLI credentials via `DefaultAzureCredential`
+4. Ensure your Azure account has "Key Vault Secrets User" role on the vault
 
-### Option 2: Visual Studio Authentication
+### Option 3: Visual Studio Authentication
+
+For developers using Visual Studio:
 
 1. Sign in to Visual Studio with your Azure account
 2. Go to Tools → Options → Azure Service Authentication
 3. Select your account
 4. `DefaultAzureCredential` will use your VS credentials
 
-### Option 3: User Secrets (for local development without Key Vault)
+### Option 4: User Secrets (Alternative to Local Files)
 
 If you don't want to use Key Vault locally, you can use .NET User Secrets:
 
