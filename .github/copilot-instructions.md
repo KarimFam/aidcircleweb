@@ -470,6 +470,35 @@ var firstName = User.FindFirstValue(ClaimTypes.GivenName);
 var isVolunteer = User.HasClaim("IsVolunteer", "true");
 ```
 
+**CRITICAL: User Lookup Pattern**
+Never use hardcoded user IDs or assume claims contain GUIDs. Azure AD External ID returns string identifiers, not GUIDs. Always look up users in the database:
+
+```csharp
+// CORRECT: Look up user by external auth ID
+var externalAuthIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+if (externalAuthIdClaim == null)
+{
+    throw new InvalidOperationException("User claim 'nameidentifier' not found.");
+}
+
+var appUser = await UserService.GetByExternalAuthIdAsync(externalAuthIdClaim.Value);
+if (appUser == null)
+{
+    throw new InvalidOperationException("User not found in database.");
+}
+
+Guid currentUserId = appUser.UserId; // Now we have the internal GUID
+
+// WRONG: Hardcoded fallback (security vulnerability)
+currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // ❌ NEVER DO THIS
+```
+
+**Authentication Requirements**:
+- All chat pages require `[Authorize]` attribute
+- Unauthenticated users redirected to login
+- Users must exist in database (linked to Azure AD External ID)
+- No fallback to demo/default user IDs in production code
+
 ## Historical Context & Lessons Learned
 
 ### Evolution of the Codebase

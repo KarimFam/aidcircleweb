@@ -2,8 +2,12 @@
 @using H4H.Application.Interfaces
 @using H4H.Application.DTOs
 @using H4H.Domain.Enums
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @inject IChatService ChatService
+@inject IUserService UserService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>AI Chat Assistant</PageTitle>
@@ -108,23 +112,33 @@
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (user.Identity?.IsAuthenticated == true)
+            if (!user.Identity?.IsAuthenticated == true)
             {
-                var userIdClaim = user.FindFirst("sub") ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
-                {
-                    currentUserId = userId;
-                }
-                else
-                {
-                    // Default user ID for demo purposes
-                    currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
-                }
+                NavigationManager.NavigateTo("/authentication/login");
+                return;
             }
-            else
+
+            // Get the Azure AD External ID (from nameidentifier claim)
+            var externalAuthIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (externalAuthIdClaim == null)
             {
-                currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+                throw new InvalidOperationException("User claim 'nameidentifier' not found. Cannot identify user.");
             }
+
+            string externalAuthId = externalAuthIdClaim.Value;
+
+            // Look up the user in our database by their external auth ID
+            var allUsers = await UserService.GetAllUsersAsync();
+            var appUser = allUsers.FirstOrDefault(u => u.ExternalAuthId == externalAuthId);
+
+            if (appUser == null)
+            {
+                // User exists in Azure AD but not in our database - this shouldn't happen in production
+                // In a real system, you'd auto-create the user here or redirect to onboarding
+                throw new InvalidOperationException($"User with external auth ID '{externalAuthId}' not found in database. Please contact support.");
+            }
+
+            currentUserId = appUser.UserId;
 
             // Create or get latest session
             var userSessions = await ChatService.GetUserSessionsAsync(currentUserId);
