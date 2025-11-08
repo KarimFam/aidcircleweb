@@ -1,52 +1,154 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
 
 @inject IOrderService OrderService
 @inject IItemService ItemService
 @inject IVolunteerService VolunteerService
-@inject IWeatherService WeatherService
 
-@attribute [AllowAnonymous]
+<PageTitle>Dashboard - AidCircle</PageTitle>
 
-<h3>Bulletin Board</h3>
+<AuthorizeView>
+    <Authorized>
+        <div class="dashboard-page">
+            <div class="ac-container">
+                <div class="dashboard-header ac-mb-xl">
+                    <h1 class="ac-heading-1">Welcome back, @userName!</h1>
+                    <p class="ac-text-body">Here's what's happening in your community today.</p>
+                </div>
 
-<div class="bulletin-board">
-    <div class="board-section raised-box">
-        <h4>Latest Orders (Last 7 Days)</h4>
-        <OrdersComponent />
-    </div>
-    <div class="board-section raised-box">
-        <h4>Latest Items (Last 7 Days)</h4>
-        <ItemsComponent />
-    </div>
-    <div class="board-section raised-box">
-        <h4>Online Volunteers</h4>
-        <VolunteersComponent />
-    </div>
-    <div class="board-section raised-box">
-        <h4>Local Weather - Tampa, FL</h4>
-        <WeatherComponent />
+                @if (isLoading)
+        {
+            <LoadingSpinner Message="Loading your dashboard..." />
+        }
+        else
+        {
+            @* Dashboard Stats *@
+            <div class="ac-grid ac-grid-cols-1 ac-grid-cols-md-3 ac-mb-xl">
+                <StatCard Value="@activeOrders.ToString()" Title="Active Orders" Subtitle="Pending fulfillment">
+                    <IconContent>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </IconContent>
+                </StatCard>
+
+                <StatCard Value="@availableItems.ToString()" Title="Available Items" Subtitle="Ready for distribution" CssClass="stat-card-secondary">
+                    <IconContent>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </IconContent>
+                </StatCard>
+
+                <StatCard Value="@volunteerCount.ToString()" Title="Active Volunteers" Subtitle="In your network" CssClass="stat-card-accent">
+                    <IconContent>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </IconContent>
+                </StatCard>
+            </div>
+
+            @* Quick Actions *@
+            <div class="ac-grid ac-grid-cols-1 ac-grid-cols-md-2 ac-gap-lg ac-mb-xl">
+                <Card Title="Quick Actions">
+                    <div class="quick-actions">
+                        <a href="/orders" class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Create New Order</span>
+                        </a>
+                        <a href="/items" class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            <span>Add Item</span>
+                        </a>
+                        <a href="/volunteers" class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>Find Volunteers</span>
+                        </a>
+                        <a href="/chat" class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <span>AI Assistant</span>
+                        </a>
+                    </div>
+                </Card>
+
+                <Card Title="Recent Activity">
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">📦</div>
+                            <div class="activity-content">
+                                <div class="activity-title">New order created</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">👤</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Volunteer assigned</div>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">✅</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Order completed</div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+        }
     </div>
 </div>
+    </Authorized>
+    <NotAuthorized>
+        @{
+            // Redirect to welcome page for unauthenticated users
+            Navigation.NavigateTo("/welcome", forceLoad: false);
+        }
+    </NotAuthorized>
+</AuthorizeView>
 
-<style>
-    body {
-        background-color: #E6F0F3; /* New background color */
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    private string userName = "User";
+    private bool isLoading = true;
+    private int activeOrders = 0;
+    private int availableItems = 0;
+    private int volunteerCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null)
+        {
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                userName = user.Identity.Name ?? "User";
+                
+                // Load dashboard data (placeholder values for now)
+                await Task.Delay(500); // Simulate API call
+                activeOrders = 12;
+                availableItems = 247;
+                volunteerCount = 45;
+            }
+        }
+
+        isLoading = false;
     }
-    .bulletin-board {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        background-color: #E6F0F3; /* Calming color */
-    }
-    .board-section {
-        border: none;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect */
-        background-color: #FFFFFF; /* White background */
-    }
-    .raised-box {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-</style>
+}

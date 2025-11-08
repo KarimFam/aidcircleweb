@@ -13,5 +13,7 @@ public class MappingProfile : Profile
         CreateMap<Volunteer, VolunteerDto>().ReverseMap();
         CreateMap<Organization, OrganizationDto>().ReverseMap();
         CreateMap<Order, OrderDto>().ReverseMap();
+        CreateMap<ChatSession, ChatSessionDto>().ReverseMap();
+        CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
     }
 }

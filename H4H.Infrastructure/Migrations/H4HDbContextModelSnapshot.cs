@@ -92,6 +92,104 @@ namespace H4H.Infrastructure.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("H4H.Domain.Entities.ChatMessage", b =>
+                {
+                    b.Property<Guid>("ChatMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "chatMessageId");
+
+                    b.Property<string>("AgentMetadata")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "agentMetadata");
+
+                    b.Property<Guid>("ChatSessionId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "chatSessionId");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "content");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExecutionTimeMs")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "executionTimeMs");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("OriginalLanguage")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "originalLanguage");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "role");
+
+                    b.Property<int?>("TargetLanguage")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "targetLanguage");
+
+                    b.Property<int?>("TokensUsed")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "tokensUsed");
+
+                    b.Property<string>("TranslatedContent")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "translatedContent");
+
+                    b.HasKey("ChatMessageId");
+
+                    b.HasIndex("ChatSessionId");
+
+                    b.ToTable("ChatMessages");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "messages");
+                });
+
+            modelBuilder.Entity("H4H.Domain.Entities.ChatSession", b =>
+                {
+                    b.Property<Guid>("ChatSessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "chatSessionId");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "isActive");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PreferredLanguage")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "preferredLanguage");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasAnnotation("Relational:JsonPropertyName", "title");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "userId");
+
+                    b.HasKey("ChatSessionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatSessions");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "chatSession");
+                });
+
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>
                 {
                     b.Property<Guid>("ItemId")
@@ -239,14 +337,14 @@ namespace H4H.Infrastructure.Migrations
 
                     b.Property<string>("ExternalAuthId")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
                         .HasAnnotation("Relational:JsonPropertyName", "externalAuthId");
 
                     b.Property<string>("ExternalAuthProvider")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasAnnotation("Relational:JsonPropertyName", "externalAuthProvider");
 
                     b.Property<string>("FirstName")
@@ -280,7 +378,9 @@ namespace H4H.Infrastructure.Migrations
 
                     b.HasDiscriminator().HasValue("User");
 
-                    b.UseTphMappingStrategy();
+                    b
+                        .UseTphMappingStrategy()
+                        .HasAnnotation("Relational:JsonPropertyName", "user");
                 });
 
             modelBuilder.Entity("Volunteer", b =>
@@ -315,6 +415,28 @@ namespace H4H.Infrastructure.Migrations
                     b.Navigation("Item");
 
                     b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("H4H.Domain.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("H4H.Domain.Entities.ChatSession", "ChatSession")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChatSession");
+                });
+
+            modelBuilder.Entity("H4H.Domain.Entities.ChatSession", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -362,6 +484,11 @@ namespace H4H.Infrastructure.Migrations
                         .HasForeignKey("UsersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("H4H.Domain.Entities.ChatSession", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("H4H.Domain.Entities.Item", b =>

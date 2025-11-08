@@ -1,0 +1,128 @@
+/* Dashboard Home Page Styles */
+
+.dashboard-page {
+    padding: var(--ac-space-xl) 0;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    margin-bottom: var(--ac-space-2xl);
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ac-space-md);
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ac-space-sm);
+    padding: var(--ac-space-lg);
+    background: var(--ac-gray-50);
+    border: 2px solid var(--ac-gray-200);
+    border-radius: var(--ac-radius-md);
+    text-decoration: none;
+    color: var(--ac-gray-700);
+    font-weight: 500;
+    transition: all var(--ac-transition-fast);
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: var(--ac-primary-light);
+    border-color: var(--ac-primary);
+    color: var(--ac-primary);
+    transform: translateY(-2px);
+}
+
+.action-button svg {
+    width: 32px;
+    height: 32px;
+}
+
+/* Activity List */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ac-space-md);
+}
+
+.activity-item {
+    display: flex;
+    gap: var(--ac-space-md);
+    padding: var(--ac-space-md);
+    background: var(--ac-gray-50);
+    border-radius: var(--ac-radius-md);
+    transition: background var(--ac-transition-fast);
+}
+
+.activity-item:hover {
+    background: var(--ac-gray-100);
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ac-white);
+    border-radius: var(--ac-radius-md);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 500;
+    color: var(--ac-gray-900);
+    margin-bottom: var(--ac-space-xs);
+}
+
+.activity-time {
+    font-size: var(--ac-text-sm);
+    color: var(--ac-gray-500);
+}
+
+/* Stat Card Variants */
+:global(.stat-card-secondary) {
+    border-left-color: var(--ac-secondary);
+}
+
+:global(.stat-card-secondary .stat-icon) {
+    background: var(--ac-secondary-light);
+    color: var(--ac-secondary);
+}
+
+:global(.stat-card-accent) {
+    border-left-color: var(--ac-accent);
+}
+
+:global(.stat-card-accent .stat-icon) {
+    background: #fef3c7;
+    color: var(--ac-accent);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 767px) {
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .action-button {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: var(--ac-space-md);
+    }
+
+    .action-button svg {
+        width: 24px;
+        height: 24px;
+    }
+}

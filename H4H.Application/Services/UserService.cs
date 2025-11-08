@@ -26,6 +26,12 @@ namespace H4H.Application.Services
             return await _userRepository.GetByIdAsync(UserId);
         }
 
+        public async Task<User?> GetByExternalAuthIdAsync(string externalAuthId)
+        {
+            var allUsers = await _userRepository.GetAllAsync();
+            return allUsers.FirstOrDefault(u => u.ExternalAuthId == externalAuthId);
+        }
+
         public async Task AddUserAsync(User user)
         {
             await _userRepository.AddAsync(user);

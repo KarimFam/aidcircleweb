@@ -8,9 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H4H.Domain\H4H.Domain.csproj" />
+    <ProjectReference Include="..\H4H.Application\H4H.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
@@ -23,6 +25,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.10" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.25.0" />
   </ItemGroup>
 
 </Project>

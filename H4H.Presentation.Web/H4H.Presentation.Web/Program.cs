@@ -1,5 +1,7 @@
 using H4H.Infrastructure.Repositories;
+using H4H.Infrastructure.Services;
 using H4H.Domain.Interfaces;
+using H4H.Domain.Entities;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Presentation.Web.Client.Pages;
 using H4H.Presentation.Web.Components;
@@ -13,11 +15,40 @@ using System.Reflection;
 using System.Linq.Dynamic.Core;
 using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load local development secrets (git-ignored file)
+if (builder.Environment.IsDevelopment())
+{
+    var localSettingsPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.Development.Local.json");
+    if (File.Exists(localSettingsPath))
+    {
+        builder.Configuration.AddJsonFile("appsettings.Development.Local.json", optional: true, reloadOnChange: true);
+    }
+}
+
+// Configure Azure Key Vault (for production and local dev with Azure auth)
+var keyVaultName = builder.Configuration["KeyVaultName"];
+if (!string.IsNullOrEmpty(keyVaultName))
+{
+    var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+    
+    // Use DefaultAzureCredential for authentication (supports local dev + Azure)
+    builder.Configuration.AddAzureKeyVault(
+        keyVaultUri,
+        new DefaultAzureCredential()
+    );
+}
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -35,13 +66,9 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnCh
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<HttpContextAccessor>();
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
 
+// Remove global authentication requirement - allow public pages
+// Individual pages use [Authorize] attribute as needed
 builder.Services.AddAuthorization(config =>
 {
     config.AddPolicy("Volunteer", policy => policy.RequireClaim("IsVolunteer", "true"));
@@ -51,7 +78,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApp(options =>
                 {
                     
-                    builder.Configuration.Bind("AzureAdB2C", options);
+                    builder.Configuration.Bind("AzureAd", options);
                     options.Events = new OpenIdConnectEvents
                     {
                         OnRedirectToIdentityProvider = async ctxt =>
@@ -99,6 +126,37 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                                         c => c.Type == "name")?.Value;
                                     var idp_access_token = colClaims.FirstOrDefault(
                                         c => c.Type == "idp_access_token")?.Value;
+
+                                    // Auto-create user in database if doesn't exist
+                                    if (!string.IsNullOrEmpty(Objectidentifier))
+                                    {
+                                        var userService = ctxt.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                                        var existingUser = await userService.GetByExternalAuthIdAsync(Objectidentifier);
+                                        
+                                        if (existingUser == null)
+                                        {
+                                            // Create new user
+                                            var newUser = new User
+                                            {
+                                                UserId = Guid.NewGuid(),
+                                                ExternalAuthId = Objectidentifier,
+                                                ExternalAuthProvider = "AzureAD", // Simplified instead of full URL
+                                                Email = EmailAddress ?? $"{Objectidentifier}@placeholder.com",
+                                                FirstName = FirstName ?? "User",
+                                                LastName = LastName ?? "",
+                                                Username = DisplayName ?? EmailAddress ?? Objectidentifier,
+                                                IsActive = true,
+                                                DateOfBirth = DateTime.Now.AddYears(-25), // Default placeholder
+                                                CreatedDate = DateTime.Now,
+                                                ModifiedDate = DateTime.Now,
+                                                Addresses = new List<Address>(),
+                                                Items = new List<Item>(),
+                                                Orders = new List<Order>()
+                                            };
+                                            
+                                            await userService.AddUserAsync(newUser);
+                                        }
+                                    }
                                 }
                             }
                             await Task.Yield();
@@ -108,9 +166,17 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
 
 
-//Database Connection
-builder.Services.AddDbContext<H4HDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("H4HDB-DEV")));
+// Database Connection - Use DbContextPool for improved performance and scalability in high-concurrency scenarios (e.g., Blazor Server, API endpoints)
+builder.Services.AddDbContextPool<H4HDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("H4HDB-DEV"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 
 // Services
 builder.Services.AddScoped<IAddressService, AddressService>();
@@ -119,7 +185,11 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-builder.Services.AddScoped<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+
+// AI Services
+builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
+builder.Services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
 // Repositories
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -128,10 +198,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
-
-// Add HttpClient for WeatherService
-builder.Services.AddHttpClient<IWeatherRepository, WeatherRepository>();
+builder.Services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
 
 var app = builder.Build();
@@ -139,9 +207,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-
     app.UseWebAssemblyDebugging();
 }
 else
@@ -151,19 +216,23 @@ else
     app.UseHsts();
 }
 
-//app.UseAuthentication();
-app.UseHttpsRedirection();
-
+// Enable HTTPS redirection except in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+// Authentication MUST come before authorization and MapRazorComponents
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(H4H.Presentation.Web.Client._Imports).Assembly);
 
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

@@ -1,0 +1,32 @@
+@* Statistics Card Component *@
+
+<div class="stat-card @CssClass">
+    <div class="stat-icon">
+        @IconContent
+    </div>
+    <div class="stat-content">
+        <div class="stat-value">@Value</div>
+        <div class="stat-title">@Title</div>
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <div class="stat-subtitle">@Subtitle</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public RenderFragment? IconContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = "";
+}

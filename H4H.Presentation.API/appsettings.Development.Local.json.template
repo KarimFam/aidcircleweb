@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "H4HDB-DEV": "Server=YOUR_SQL_SERVER;Database=YOUR_DATABASE;User Id=YOUR_USERNAME;Password=YOUR_PASSWORD;TrustServerCertificate=True;"
+  },
+  "AzureOpenAI": {
+    "ApiKey": "YOUR_AZURE_OPENAI_API_KEY"
+  },
+  "AzureTranslator": {
+    "Key": "YOUR_AZURE_TRANSLATOR_API_KEY"
+  }
+}
