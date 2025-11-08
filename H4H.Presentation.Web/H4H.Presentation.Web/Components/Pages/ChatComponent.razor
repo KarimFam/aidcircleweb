@@ -1,0 +1,382 @@
+@page "/chat"
+@using H4H.Application.Interfaces
+@using H4H.Application.DTOs
+@using H4H.Domain.Enums
+@inject IChatService ChatService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@rendermode InteractiveServer
+
+<PageTitle>AI Chat Assistant</PageTitle>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <h3>🤖 AidCircle AI Assistant</h3>
+        <div class="language-selector">
+            <label>Language:</label>
+            <select @bind="selectedLanguage" @bind:after="OnLanguageChanged">
+                <option value="@ChatLanguage.English">English</option>
+                <option value="@ChatLanguage.Spanish">Español</option>
+                <option value="@ChatLanguage.French">Français</option>
+                <option value="@ChatLanguage.German">Deutsch</option>
+                <option value="@ChatLanguage.Chinese">中文</option>
+                <option value="@ChatLanguage.Arabic">العربية</option>
+                <option value="@ChatLanguage.Portuguese">Português</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="chat-messages" @ref="chatMessagesContainer">
+        @if (messages != null && messages.Any())
+        {
+            @foreach (var msg in messages)
+            {
+                <div class="message @(msg.Role == MessageRole.User ? "user-message" : "assistant-message")">
+                    <div class="message-header">
+                        <strong>@(msg.Role == MessageRole.User ? "You" : "Assistant")</strong>
+                        <span class="message-time">@msg.CreatedDate.ToString("t")</span>
+                    </div>
+                    <div class="message-content">
+                        @GetDisplayContent(msg)
+                    </div>
+                    @if (msg.ExecutionTimeMs.HasValue && msg.Role == MessageRole.Assistant)
+                    {
+                        <div class="message-meta">
+                            <small>⚡ @msg.ExecutionTimeMs ms | 🎯 @msg.TokensUsed tokens</small>
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else if (isLoading)
+        {
+            <div class="loading-message">
+                <p>Loading chat session...</p>
+            </div>
+        }
+        else
+        {
+            <div class="welcome-message">
+                <h4>Welcome to AidCircle AI Assistant!</h4>
+                <p>I can help you with:</p>
+                <ul>
+                    <li>Managing volunteers and organizations</li>
+                    <li>Coordinating aid items and orders</li>
+                    <li>Answering questions about the platform</li>
+                    <li>Multi-language support for global collaboration</li>
+                </ul>
+                <p><strong>Start by asking me anything!</strong></p>
+            </div>
+        }
+
+        @if (isSending)
+        {
+            <div class="message assistant-message typing">
+                <div class="message-content">
+                    <span class="typing-indicator">●●●</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="chat-input-container">
+        <textarea @bind="userInput"
+                  @bind:event="oninput"
+                  @onkeydown="HandleKeyDown"
+                  placeholder="Type your message... (Shift+Enter for new line, Enter to send)"
+                  rows="3"
+                  disabled="@isSending"></textarea>
+        <button @onclick="SendMessage" disabled="@(string.IsNullOrWhiteSpace(userInput) || isSending)" class="btn btn-primary">
+            @(isSending ? "Sending..." : "Send")
+        </button>
+    </div>
+</div>
+
+@code {
+    private Guid? currentSessionId;
+    private Guid currentUserId;
+    private List<ChatMessageDto>? messages;
+    private string userInput = string.Empty;
+    private ChatLanguage selectedLanguage = ChatLanguage.English;
+    private bool isLoading = true;
+    private bool isSending = false;
+    private ElementReference chatMessagesContainer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = user.FindFirst("sub") ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+                {
+                    currentUserId = userId;
+                }
+                else
+                {
+                    // Default user ID for demo purposes
+                    currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+                }
+            }
+            else
+            {
+                currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            }
+
+            // Create or get latest session
+            var userSessions = await ChatService.GetUserSessionsAsync(currentUserId);
+            if (userSessions != null && userSessions.Any())
+            {
+                var latestSession = userSessions.First();
+                currentSessionId = latestSession.ChatSessionId;
+                selectedLanguage = latestSession.PreferredLanguage;
+                if (currentSessionId.HasValue)
+                {
+                    messages = await ChatService.GetSessionMessagesAsync(currentSessionId.Value);
+                }
+            }
+            else
+            {
+                var newSession = await ChatService.CreateSessionAsync(currentUserId, selectedLanguage);
+                currentSessionId = newSession.ChatSessionId;
+                messages = new List<ChatMessageDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing chat: {ex.Message}");
+            messages = new List<ChatMessageDto>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userInput) || !currentSessionId.HasValue || isSending)
+            return;
+
+        isSending = true;
+        var messageText = userInput.Trim();
+        userInput = string.Empty;
+
+        try
+        {
+            // Add user message to UI immediately
+            messages ??= new List<ChatMessageDto>();
+            messages.Add(new ChatMessageDto
+                {
+                    Role = MessageRole.User,
+                    Content = messageText,
+                    CreatedDate = DateTime.Now
+                });
+
+            StateHasChanged();
+
+            // Send message and get response
+            var response = await ChatService.SendMessageAsync(currentSessionId.Value, messageText);
+
+            // Refresh messages to get both user and assistant messages
+            messages = await ChatService.GetSessionMessagesAsync(currentSessionId.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending message: {ex.Message}");
+            messages?.Add(new ChatMessageDto
+                {
+                    Role = MessageRole.Assistant,
+                    Content = $"Sorry, I encountered an error: {ex.Message}",
+                    CreatedDate = DateTime.Now
+                });
+        }
+        finally
+        {
+            isSending = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnLanguageChanged()
+    {
+        if (currentSessionId.HasValue)
+        {
+            try
+            {
+                await ChatService.UpdateSessionLanguageAsync(currentSessionId.Value, selectedLanguage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating language: {ex.Message}");
+            }
+        }
+        StateHasChanged();
+    }
+
+    private string GetDisplayContent(ChatMessageDto message)
+    {
+        // If there's a translated version and it's different from original, show translation
+        if (!string.IsNullOrEmpty(message.TranslatedContent) && 
+            message.TranslatedContent != message.Content)
+        {
+            return message.TranslatedContent;
+        }
+        return message.Content;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+}
+
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 150px);
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .chat-header {
+        padding: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+    }
+
+    .language-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .language-selector select {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: none;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+    }
+
+    .message {
+        margin-bottom: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        max-width: 75%;
+        animation: fadeIn 0.3s;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+        background: #007bff;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .assistant-message {
+        background: white;
+        border: 1px solid #e0e0e0;
+        margin-right: auto;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.85em;
+        opacity: 0.8;
+    }
+
+    .message-content {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .message-meta {
+        margin-top: 8px;
+        font-size: 0.75em;
+        opacity: 0.7;
+    }
+
+    .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .welcome-message ul {
+        text-align: left;
+        max-width: 400px;
+        margin: 20px auto;
+    }
+
+    .typing-indicator {
+        display: inline-block;
+        animation: blink 1.4s infinite;
+    }
+
+    @@keyframes blink {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
+
+    .chat-input-container {
+        padding: 20px;
+        border-top: 2px solid #e0e0e0;
+        display: flex;
+        gap: 10px;
+        background: white;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .chat-input-container textarea {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        resize: none;
+        font-family: inherit;
+    }
+
+    .chat-input-container button {
+        padding: 12px 24px;
+        border-radius: 4px;
+        align-self: flex-end;
+    }
+
+    .loading-message {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+</style>
