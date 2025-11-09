@@ -8,6 +8,7 @@
 - [Application Deployment](#application-deployment)
 - [Post-Deployment Verification](#post-deployment-verification)
 - [CI/CD Pipeline](#cicd-pipeline)
+- [Alternative: IIS with Azure Arc](#alternative-iis-with-azure-arc)
 
 ## Prerequisites
 
@@ -607,8 +608,31 @@ dotnet ef database update PreviousMigrationName `
 - Scale down during off-hours
 - Use reserved capacity for predictable workloads
 
+---
+
+## Alternative: IIS with Azure Arc
+
+If you prefer to host AidCircle on **your own Windows Server** while still leveraging Azure services, see the **[IIS + Azure Arc Deployment Guide](deployment-iis-arc.md)**.
+
+**When to use IIS + Azure Arc**:
+- ✅ You own Windows Server infrastructure
+- ✅ You want control over the hosting environment
+- ✅ You need to comply with on-premises requirements
+- ✅ You still want Azure Key Vault integration via managed identity
+
+**Key differences from App Service**:
+- You manage server updates and security patches
+- Lower monthly cost (~$5-10/month Azure Arc + server costs)
+- Full control over IIS configuration
+- Same managed identity capabilities as Azure App Service
+
+See the complete guide at: **[deployment-iis-arc.md](deployment-iis-arc.md)**
+
+---
+
 ## Next Steps
 
 - 📚 **Understand the Architecture** → Read [Architecture Overview](architecture-overview.md)
 - 💬 **Explore AI Chat** → See [AI Chat Deep Dive](ai-chat.md)
 - 💻 **Local Development** → Follow [Local Development Guide](local-development.md)
+- 🖥️ **Deploy to IIS** → Try [IIS + Azure Arc Deployment](deployment-iis-arc.md)

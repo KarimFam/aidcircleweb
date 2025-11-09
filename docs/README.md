@@ -13,7 +13,8 @@ Welcome to the comprehensive documentation for **AidCircle** - an intelligent ai
 | **[Architecture Overview](architecture-overview.md)** | Clean architecture, domain model, AI chat architecture, technology stack | Developers, Architects |
 | **[Local Development Setup](local-development.md)** | Prerequisites, secrets management, running locally, troubleshooting | New Developers |
 | **[AI Chat Deep Dive](ai-chat.md)** | Multi-language chat flow, Semantic Kernel integration, agent plugins | AI Developers, Contributors |
-| **[Deployment Guide](deployment.md)** | Azure resource setup, Key Vault configuration, CI/CD pipeline | DevOps, Deployment Teams |
+| **[Azure App Service Deployment](deployment.md)** | Azure resource setup, Key Vault configuration, CI/CD pipeline | DevOps, Cloud Teams |
+| **[IIS + Azure Arc Deployment](deployment-iis-arc.md)** | On-premises deployment with Azure integration, managed identity | DevOps, On-Premises Teams |
 
 ### Quick Reference
 
@@ -39,7 +40,10 @@ Welcome to the comprehensive documentation for **AidCircle** - an intelligent ai
 → [AI Chat Deep Dive](ai-chat.md)
 
 **...deploy to Azure**  
-→ [Deployment Guide](deployment.md)
+→ [Azure App Service Deployment](deployment.md)
+
+**...deploy to my own server**  
+→ [IIS + Azure Arc Deployment](deployment-iis-arc.md)
 
 **...find common commands**  
 → [Command Snippets](snippets/commands.md)
