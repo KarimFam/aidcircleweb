@@ -2,9 +2,10 @@
 @using H4H.Application.Interfaces
 @using H4H.Application.DTOs
 @using H4H.Domain.Enums
+@using H4H.Presentation.Web.Components.Services
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
-@inject IChatService ChatService
+@inject IHybridChatService HybridChatService
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -140,8 +141,8 @@
 
             currentUserId = appUser.UserId;
 
-            // Create or get latest session
-            var userSessions = await ChatService.GetUserSessionsAsync(currentUserId);
+            // Create or get latest session (using hybrid service - API or direct)
+            var userSessions = await HybridChatService.GetUserSessionsAsync(currentUserId);
             if (userSessions != null && userSessions.Any())
             {
                 var latestSession = userSessions.First();
@@ -149,12 +150,12 @@
                 selectedLanguage = latestSession.PreferredLanguage;
                 if (currentSessionId.HasValue)
                 {
-                    messages = await ChatService.GetSessionMessagesAsync(currentSessionId.Value);
+                    messages = await HybridChatService.GetSessionMessagesAsync(currentSessionId.Value);
                 }
             }
             else
             {
-                var newSession = await ChatService.CreateSessionAsync(currentUserId, selectedLanguage);
+                var newSession = await HybridChatService.CreateSessionAsync(currentUserId, selectedLanguage);
                 currentSessionId = newSession.ChatSessionId;
                 messages = new List<ChatMessageDto>();
             }
@@ -192,11 +193,11 @@
 
             StateHasChanged();
 
-            // Send message and get response
-            var response = await ChatService.SendMessageAsync(currentSessionId.Value, messageText);
+            // Send message and get response (using hybrid service)
+            var response = await HybridChatService.SendMessageAsync(currentSessionId.Value, messageText);
 
             // Refresh messages to get both user and assistant messages
-            messages = await ChatService.GetSessionMessagesAsync(currentSessionId.Value);
+            messages = await HybridChatService.GetSessionMessagesAsync(currentSessionId.Value);
         }
         catch (Exception ex)
         {
@@ -221,7 +222,7 @@
         {
             try
             {
-                await ChatService.UpdateSessionLanguageAsync(currentSessionId.Value, selectedLanguage);
+                await HybridChatService.UpdateSessionLanguageAsync(currentSessionId.Value, selectedLanguage);
             }
             catch (Exception ex)
             {

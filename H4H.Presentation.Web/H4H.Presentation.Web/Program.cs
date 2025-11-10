@@ -5,6 +5,8 @@ using H4H.Domain.Entities;
 using H4H.Infrastructure.Data.Contexts;
 using H4H.Presentation.Web.Client.Pages;
 using H4H.Presentation.Web.Components;
+using H4H.Presentation.Web.Services;
+using H4H.Presentation.Web.Components.Services;
 using Microsoft.EntityFrameworkCore;
 using H4H.Application.Services;
 using H4H.Application.Interfaces;
@@ -187,11 +189,25 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
+// Hybrid service for API/Direct access
+builder.Services.AddScoped<IHybridChatService, HybridChatService>();
+
 // AI Services
 builder.Services.AddSingleton<IAzureTranslatorService, AzureTranslatorService>();
 builder.Services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
-// Repositories
+// API Client for backend communication
+builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
+{
+    var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5135";
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// Hybrid services (API client + direct fallback)
+builder.Services.AddScoped<IHybridChatService, HybridChatService>();
+
+// Repositories (keep for direct database access if needed, but prefer API client)
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using H4H.Presentation.API;
+using H4H.Presentation.API.Middleware;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
@@ -70,6 +71,24 @@ builder.Services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>(
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
+// Configure CORS for Web frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebFrontend", policy =>
+    {
+        policy.WithOrigins(
+            builder.Configuration["ApiSettings:AllowedOrigins"]?.Split(',') ?? new[]
+            {
+                "https://aidcircle.net",
+                "https://www.aidcircle.net",
+                "https://localhost:5011",  // Local dev - Web
+                "http://localhost:5011"    // Local dev - Web (non-HTTPS)
+            })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -88,7 +107,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Enable CORS
+app.UseCors("AllowWebFrontend");
+
+// Use dual authentication middleware (Azure AD B2C tokens + API key fallback)
+app.UseDualAuthentication();
+
 app.UseAuthorization();
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }));
 
 app.MapControllers();
 
