@@ -235,7 +235,36 @@ public async Task AddAsync(ChatMessage entity) {
 ```
 
 ### Azure Service Configuration
-Required in `appsettings.json`:
+**CRITICAL**: NEVER store secrets directly in `appsettings.json`. Use Azure Key Vault instead.
+
+**Production Pattern** (Key Vault):
+```csharp
+// Program.cs - Load secrets from Key Vault
+var keyVaultName = builder.Configuration["KeyVaultName"];
+if (!string.IsNullOrEmpty(keyVaultName))
+{
+    var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+    
+    var credentialOptions = new DefaultAzureCredentialOptions
+    {
+        ExcludeVisualStudioCredential = true,
+        ExcludeVisualStudioCodeCredential = true,
+        ExcludeAzureCliCredential = !builder.Environment.IsDevelopment(),
+        ExcludeAzurePowerShellCredential = true,
+        ExcludeSharedTokenCacheCredential = true,
+        ExcludeInteractiveBrowserCredential = true,
+        ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+    };
+    
+    builder.Configuration.AddAzureKeyVault(
+        keyVaultUri,
+        new DefaultAzureCredential(credentialOptions)
+    );
+}
+```
+
+**Development Pattern** (Local appsettings):
+Create `appsettings.Development.Local.json` (NOT committed to source control):
 ```json
 {
   "AzureOpenAI": {
@@ -247,8 +276,19 @@ Required in `appsettings.json`:
     "Key": "YOUR-KEY",
     "Endpoint": "https://api.cognitive.microsofttranslator.com",
     "Region": "eastus"
+  },
+  "ConnectionStrings": {
+    "H4HDB-DEV": "Server=localhost;Database=H4H;Trusted_Connection=True;"
   }
 }
+```
+
+**Key Vault Secret Names** (use double dash for nested configuration):
+- `H4HDB-DEV` → ConnectionStrings:H4HDB-DEV
+- `AzureOpenAI--ApiKey` → AzureOpenAI:ApiKey
+- `AzureOpenAI--Endpoint` → AzureOpenAI:Endpoint
+- `AzureTranslator--Key` → AzureTranslator:Key
+
 ```
 
 ### Dependency Injection for AI Services
@@ -364,6 +404,116 @@ The repository pattern supports swapping SQL Server for Cosmos DB:
 - **API Endpoints**: `H4H.Presentation.API/Controllers/ChatController.cs`
 - **DbContext**: `H4H.Infrastructure/Data/Contexts/H4HDbContext.cs`
 - **Mapping**: `H4H.Application/Mappers/MappingProfile.cs`
+
+## IIS Deployment & Azure Key Vault Integration
+
+### Critical Lessons Learned (Production Issues Resolved)
+
+#### 🔴 Azure Arc Managed Identity Does NOT Work Reliably on IIS
+**Problem**: Despite correct configuration (HIMDS running, environment variables set, DefaultAzureCredential configured), Arc managed identity consistently fails on IIS with "No response received from the managed identity endpoint."
+
+**Root Cause**: Azure Arc HIMDS uses challenge-response authentication requiring reading challenge tokens from `C:\ProgramData\AzureConnectedMachineAgent\tokens\`. IIS worker process isolation and permissions prevent reliable access.
+
+**✅ SOLUTION**: Use Azure AD App Registration with Client Secret instead
+- Create app registration in Azure AD
+- Generate client secret
+- Store in web.config environment variables: AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET
+- DefaultAzureCredential uses EnvironmentCredential (first in chain), bypassing ManagedIdentityCredential
+
+**Pattern**:
+```csharp
+var credentialOptions = new DefaultAzureCredentialOptions
+{
+    ExcludeVisualStudioCredential = true,
+    ExcludeVisualStudioCodeCredential = true,
+    ExcludeAzureCliCredential = true,
+    ExcludeAzurePowerShellCredential = true,
+    ExcludeSharedTokenCacheCredential = true,
+    ExcludeInteractiveBrowserCredential = true,
+    ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+};
+
+builder.Configuration.AddAzureKeyVault(
+    keyVaultUri,
+    new DefaultAzureCredential(credentialOptions)
+);
+```
+
+#### 🔐 Key Vault MUST Use RBAC Role Assignments (Not Access Policies)
+**Problem**: Command `az keyvault set-policy` fails with "Cannot set policies to a vault with '--enable-rbac-authorization' specified."
+
+**Root Cause**: AidCircle Key Vault (`aidcirclekeyvault`) uses RBAC authorization model, not legacy access policies.
+
+**✅ SOLUTION**: Use RBAC role assignments:
+```powershell
+az role assignment create `
+  --role "Key Vault Secrets User" `
+  --assignee <principal-id-or-client-id> `
+  --scope "/subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<kv-name>"
+```
+
+#### 📋 IIS web.config Environment Variables Pattern
+**Required for Key Vault Access**:
+```xml
+<aspNetCore processPath="dotnet" arguments=".\YourApp.dll" hostingModel="inprocess">
+  <environmentVariables>
+    <environmentVariable name="AZURE_TENANT_ID" value="baa68cca-ef69-4d14-bcc1-eca13aaf252e" />
+    <environmentVariable name="AZURE_CLIENT_ID" value="89b5325e-6397-488a-95fe-511a5de23387" />
+    <environmentVariable name="AZURE_CLIENT_SECRET" value="<from-key-vault-or-secure-storage>" />
+    <environmentVariable name="KeyVaultName" value="aidcirclekeyvault" />
+    <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+  </environmentVariables>
+</aspNetCore>
+```
+
+**Security Notes**:
+- Set NTFS permissions on web.config (IIS AppPool identity + Administrators only)
+- NEVER commit web.config with real secrets to source control
+- Rotate client secrets regularly via Azure AD app registration
+- Consider storing client secret in Key Vault and retrieving at startup (future enhancement)
+
+#### 🔄 PowerShell 7 Does NOT Support IIS Management
+**Problem**: `Import-Module WebAdministration` fails in PowerShell 7.
+
+**✅ SOLUTION**: Use Windows PowerShell 5.1 for IIS operations:
+```powershell
+$psPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+& $psPath -Command "Import-Module WebAdministration; Restart-WebAppPool -Name 'aidcircle-web'"
+```
+
+### Deployment Configuration
+
+**Current Production Setup**:
+- **Server**: WEB1 (Windows Server with IIS, Azure Arc-enabled)
+- **Arc Agent**: v1.58, Principal ID: cc261686-88bf-4252-84c1-44b28dd1c533 (not used due to reliability issues)
+- **App Registration**: 89b5325e-6397-488a-95fe-511a5de23387 (working solution)
+- **Key Vault**: `aidcirclekeyvault` in DEVTEST subscription (RBAC-enabled)
+- **Web App Pool**: aidcircle-web on port 5011
+- **API App Pool**: aidcircle-api on port 5135
+
+**Key Vault Secrets** (Required):
+- `H4HDB-DEV`: SQL Server connection string
+- `AzureOpenAI--ApiKey`: Azure OpenAI API key
+- `AzureOpenAI--Endpoint`: Azure OpenAI endpoint
+- `AzureTranslator--Key`: Azure Translator API key
+
+**RBAC Role Assignments** (Required):
+- App Registration (89b5325e-6397-488a-95fe-511a5de23387) → "Key Vault Secrets User" role on aidcirclekeyvault
+
+### Deployment Checklist
+
+When deploying to IIS:
+1. ✅ Create Azure AD App Registration with client secret
+2. ✅ Grant "Key Vault Secrets User" RBAC role to app registration
+3. ✅ Add secrets to Key Vault (connection strings, API keys)
+4. ✅ Update web.config with AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET
+5. ✅ Set NTFS permissions on web.config (restrict access)
+6. ✅ Deploy application files to IIS physical path
+7. ✅ Recycle app pools (use Windows PowerShell 5.1)
+8. ✅ Verify logs: `C:\inetpub\wwwroot\aidcircle-web\logs\stdout_*.log`
+9. ✅ Test endpoints: http://localhost:5011 (web), http://localhost:5135/swagger (api)
+
+**See DEPLOYMENT-IIS.md for detailed step-by-step instructions**
 
 ## Authentication & Authorization (Azure AD B2C)
 
