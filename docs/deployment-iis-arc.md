@@ -401,31 +401,145 @@ Remove-PSSession $session
 > Stop-Website -Name "AidCircle Web"
 > ```
 
-### Step 3: Configure Application Settings
+### Step 3: Configure Application-Specific Environment Variables
 
-On the **IIS server**, set environment variables for each application pool:
+**CRITICAL**: Do NOT use machine-level environment variables (`[Environment]::SetEnvironmentVariable(..., "Machine")`). This makes secrets available to ALL applications on the server, which is a **security risk**.
 
-```powershell
-# Set environment variables for API pool
-[Environment]::SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production", "Machine")
-[Environment]::SetEnvironmentVariable("KeyVaultName", "kv-aidcircle-prod", "Machine")
-[Environment]::SetEnvironmentVariable("AzureOpenAI__Endpoint", "https://YOUR-RESOURCE.openai.azure.com/", "Machine")
-[Environment]::SetEnvironmentVariable("AzureOpenAI__DeploymentName", "gpt-4o-mini", "Machine")
-[Environment]::SetEnvironmentVariable("AzureTranslator__Endpoint", "https://api.cognitive.microsofttranslator.com", "Machine")
-[Environment]::SetEnvironmentVariable("AzureTranslator__Region", "eastus", "Machine")
+Instead, use **`web.config`** to set environment variables per application pool. This ensures each app has isolated configuration.
 
-# For Web app, also add Azure AD B2C settings
-[Environment]::SetEnvironmentVariable("AzureAdB2C__Instance", "https://YOUR-TENANT.b2clogin.com/", "Machine")
-[Environment]::SetEnvironmentVariable("AzureAdB2C__Domain", "YOUR-TENANT.onmicrosoft.com", "Machine")
-[Environment]::SetEnvironmentVariable("AzureAdB2C__ClientId", "YOUR_CLIENT_ID", "Machine")
-[Environment]::SetEnvironmentVariable("AzureAdB2C__SignUpSignInPolicyId", "B2C_1_susi", "Machine")
+#### Option A: Configure via web.config (RECOMMENDED)
 
-# Restart IIS to apply environment variables
-Restart-Service W3SVC -Force
+Edit `C:\inetpub\aidcircle\api\web.config`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <location path="." inheritInChildApplications="false">
+    <system.webServer>
+      <handlers>
+        <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+      </handlers>
+      <aspNetCore processPath="dotnet"
+                  arguments=".\H4H.Presentation.API.dll"
+                  stdoutLogEnabled="true"
+                  stdoutLogFile=".\logs\stdout"
+                  hostingModel="inprocess">
+        <!-- Application-specific environment variables -->
+        <environmentVariables>
+          <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+          <environmentVariable name="KeyVaultName" value="kv-aidcircle-prod" />
+          
+          <!-- Azure Arc Managed Identity Configuration -->
+          <environmentVariable name="AZURE_CLIENT_ID" value="PASTE_MANAGED_IDENTITY_CLIENT_ID_HERE" />
+          
+          <!-- Azure OpenAI Configuration -->
+          <environmentVariable name="AzureOpenAI__Endpoint" value="https://YOUR-RESOURCE.openai.azure.com/" />
+          <environmentVariable name="AzureOpenAI__DeploymentName" value="gpt-4o-mini" />
+          
+          <!-- Azure Translator Configuration -->
+          <environmentVariable name="AzureTranslator__Endpoint" value="https://api.cognitive.microsofttranslator.com" />
+          <environmentVariable name="AzureTranslator__Region" value="eastus" />
+          
+          <!-- Database Connection (if not using Key Vault) -->
+          <!-- <environmentVariable name="ConnectionStrings__H4HDB-DEV" value="YOUR_CONNECTION_STRING" /> -->
+        </environmentVariables>
+      </aspNetCore>
+    </system.webServer>
+  </location>
+</configuration>
 ```
 
+Edit `C:\inetpub\aidcircle\web\web.config`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <location path="." inheritInChildApplications="false">
+    <system.webServer>
+      <handlers>
+        <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+      </handlers>
+      <aspNetCore processPath="dotnet"
+                  arguments=".\H4H.Presentation.Web.dll"
+                  stdoutLogEnabled="true"
+                  stdoutLogFile=".\logs\stdout"
+                  hostingModel="inprocess">
+        <environmentVariables>
+          <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+          <environmentVariable name="KeyVaultName" value="kv-aidcircle-prod" />
+          
+          <!-- Azure Arc Managed Identity Configuration -->
+          <environmentVariable name="AZURE_CLIENT_ID" value="PASTE_MANAGED_IDENTITY_CLIENT_ID_HERE" />
+          
+          <!-- Azure AD B2C Configuration -->
+          <environmentVariable name="AzureAdB2C__Instance" value="https://aidcirclenet.b2clogin.com/" />
+          <environmentVariable name="AzureAdB2C__Domain" value="aidcirclenet.onmicrosoft.com" />
+          <environmentVariable name="AzureAdB2C__ClientId" value="36bf28fa-d15c-4762-8c32-8e46c3aa9051" />
+          <environmentVariable name="AzureAdB2C__SignUpSignInPolicyId" value="B2C_1_susi" />
+          
+          <!-- API Client Configuration -->
+          <environmentVariable name="ApiSettings__BaseUrl" value="http://localhost:5135" />
+          <!-- ApiSettings__ApiKey will be loaded from Key Vault -->
+          
+          <!-- Azure OpenAI & Translator (same as API) -->
+          <environmentVariable name="AzureOpenAI__Endpoint" value="https://YOUR-RESOURCE.openai.azure.com/" />
+          <environmentVariable name="AzureOpenAI__DeploymentName" value="gpt-4o-mini" />
+          <environmentVariable name="AzureTranslator__Endpoint" value="https://api.cognitive.microsofttranslator.com" />
+          <environmentVariable name="AzureTranslator__Region" value="eastus" />
+        </environmentVariables>
+      </aspNetCore>
+    </system.webServer>
+  </location>
+</configuration>
+```
+
+#### Option B: Configure via IIS Manager GUI (Alternative)
+
+1. Open **IIS Manager** → Navigate to your application
+2. Select **Configuration Editor**
+3. Section: `system.webServer/aspNetCore`
+4. Expand `environmentVariables` collection
+5. Click **Add** for each variable
+6. Click **Apply**
+
+#### Get the Managed Identity Client ID
+
+The `AZURE_CLIENT_ID` environment variable is **CRITICAL** for Arc managed identity to work:
+
+```powershell
+# On IIS server, run this to get the Client ID
+$machineName = "YOUR-SERVER-NAME"
+$resourceGroup = "rg-aidcircle-arc"
+
+az connectedmachine show `
+  --name $machineName `
+  --resource-group $resourceGroup `
+  --query "identity.principalId" -o tsv
+
+# Also get the Client ID (this is what goes in AZURE_CLIENT_ID)
+az connectedmachine show `
+  --name $machineName `
+  --resource-group $resourceGroup `
+  --query "identity" -o json
+```
+
+Sample output:
+```json
+{
+  "principalId": "12345678-1234-1234-1234-123456789abc",
+  "tenantId": "87654321-4321-4321-4321-cba987654321",
+  "type": "SystemAssigned"
+}
+```
+
+Use the **principalId** value in the `AZURE_CLIENT_ID` environment variable.
+
 > [!IMPORTANT]
-> **Machine-level environment variables** are accessible to all app pools. For isolation, use `web.config` with `<environmentVariable>` tags or Azure App Configuration.
+> After editing `web.config`, **recycle the app pool** (no full IIS restart needed):
+> ```powershell
+> Restart-WebAppPool -Name "AidCircleApiPool"
+> Restart-WebAppPool -Name "AidCircleWebPool"
+> ```
 
 ### Step 4: Configure web.config (Auto-Generated)
 
@@ -542,6 +656,134 @@ Get-Content "C:\inetpub\aidcircle\api\logs\stdout_*.log" | Select-String "Databa
 
 ## Troubleshooting
 
+### ERROR: DefaultAzureCredential Failed to Retrieve Token
+
+**Your Exact Error**:
+```
+Azure.Identity.CredentialUnavailableException: DefaultAzureCredential failed to retrieve a token from the included credentials.
+- EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+- WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured.
+```
+
+**Root Cause**: The `DefaultAzureCredential` authentication chain is failing because:
+1. ❌ **EnvironmentCredential**: Missing `AZURE_CLIENT_ID` environment variable
+2. ❌ **WorkloadIdentityCredential**: Not applicable (Kubernetes only)
+3. ❌ **ManagedIdentityCredential**: Arc HIMDS service not detected or not running
+
+**Solution Steps**:
+
+#### Step 1: Verify Azure Arc Agent is Running
+
+```powershell
+# Check HIMDS service status (this is the Arc managed identity service)
+Get-Service himds
+
+# If not running, start it
+Start-Service himds
+
+# Verify Arc connection
+azcmagent show
+
+# Should show:
+# Agent Status        : Connected
+# Agent Version       : 1.x.x
+```
+
+If `azcmagent show` fails, the Arc agent isn't installed. Follow [Azure Arc Setup](#azure-arc-setup) steps.
+
+#### Step 2: Add AZURE_CLIENT_ID Environment Variable
+
+Edit your `web.config` file and add the managed identity client ID:
+
+```powershell
+# Get the Managed Identity Principal ID
+$machineName = "YOUR-IIS-SERVER-NAME"  # Replace with your server's hostname
+$resourceGroup = "rg-aidcircle-arc"    # Replace with your resource group
+
+# Get the principal ID (this is the Client ID for Arc)
+$principalId = az connectedmachine show `
+  --name $machineName `
+  --resource-group $resourceGroup `
+  --query "identity.principalId" -o tsv
+
+Write-Host "Add this to web.config: $principalId" -ForegroundColor Green
+```
+
+Then edit `C:\inetpub\aidcircle\web\web.config`:
+
+```xml
+<environmentVariables>
+  <!-- ADD THIS LINE with the Principal ID from above -->
+  <environmentVariable name="AZURE_CLIENT_ID" value="12345678-1234-1234-1234-123456789abc" />
+  
+  <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+  <environmentVariable name="KeyVaultName" value="kv-aidcircle-prod" />
+  <!-- ... rest of your variables ... -->
+</environmentVariables>
+```
+
+Do the same for `C:\inetpub\aidcircle\api\web.config`.
+
+#### Step 3: Recycle Application Pools
+
+```powershell
+# Restart app pools (NOT full IIS restart)
+Restart-WebAppPool -Name "AidCircleApiPool"
+Restart-WebAppPool -Name "AidCircleWebPool"
+
+# Verify they restarted
+Get-WebAppPoolState -Name "AidCircleApiPool"
+Get-WebAppPoolState -Name "AidCircleWebPool"
+```
+
+#### Step 4: Test Managed Identity Endpoint
+
+```powershell
+# Test if Arc HIMDS is responding on the IIS server
+$tokenUrl = "http://localhost:40342/metadata/identity/oauth2/token?api-version=2020-06-01&resource=https://vault.azure.net"
+Invoke-RestMethod -Uri $tokenUrl -Headers @{Metadata="true"} -UseBasicParsing
+
+# Expected output: JSON with access_token field
+# If this fails, Arc managed identity isn't working
+```
+
+#### Step 5: Enable Detailed Azure Identity Logging
+
+Add this to `appsettings.Production.json` in your app directories:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Azure.Identity": "Verbose",
+      "Azure.Core": "Information"
+    }
+  }
+}
+```
+
+Then check the stdout logs in `C:\inetpub\aidcircle\web\logs\stdout_*.log` to see detailed auth flow.
+
+#### Step 6: Verify Key Vault Access Policy
+
+```powershell
+# Ensure Arc managed identity has Key Vault permissions
+$vaultName = "kv-aidcircle-prod"
+$principalId = "YOUR_MANAGED_IDENTITY_PRINCIPAL_ID"  # From Step 2
+
+# Grant access
+az keyvault set-policy `
+  --name $vaultName `
+  --object-id $principalId `
+  --secret-permissions get list
+
+# Verify
+az keyvault show `
+  --name $vaultName `
+  --query "properties.accessPolicies[?objectId=='$principalId']"
+```
+
 ### Common Issues
 
 | Issue | Symptoms | Solution |
@@ -549,9 +791,10 @@ Get-Content "C:\inetpub\aidcircle\api\logs\stdout_*.log" | Select-String "Databa
 | **500 Internal Server Error** | App won't start | Check `stdout` logs in `C:\inetpub\aidcircle\[app]\logs\` |
 | **Arc agent not connected** | `azcmagent show` shows disconnected | Restart service: `Restart-Service himds` |
 | **Key Vault 403 Forbidden** | Can't retrieve secrets | Verify access policy: `az keyvault show --name $vaultName --query "properties.accessPolicies"` |
-| **ManagedIdentityCredential unavailable** | App can't authenticate | Ensure HIMDS service is running: `Get-Service himds \| Start-Service` |
+| **ManagedIdentityCredential unavailable** | App can't authenticate | Ensure HIMDS service is running: `Get-Service himds | Start-Service` |
 | **Azure AD redirect loop** | Infinite redirects on login | Check `AzureAdB2C__Instance` ends with `/` |
 | **Chat translation errors** | 401 from Translator | Verify `AzureTranslator__Key` in Key Vault |
+| **Environment variables not loaded** | Config values null | Verify `web.config` has `<environmentVariables>` section, recycle app pool |
 
 ### Enable Detailed Logging
 

@@ -252,6 +252,19 @@ flowchart TB
 | [Local Development Setup](docs/local-development.md) | Prerequisites, secrets management, running locally, troubleshooting |
 | [AI Chat Deep Dive](docs/ai-chat.md) | Multi-language chat flow, Semantic Kernel integration, agent plugins |
 | [Deployment Guide](docs/deployment.md) | Azure resource setup, Key Vault configuration, CI/CD pipeline |
+| [IIS + Azure Arc Deployment](docs/deployment-iis-arc.md) | Deploy to your own Windows Server with Arc managed identity |
+| **[⚡ Quick Fix Guide](QUICK-FIX-RUN-NOW.md)** | **Run this now if you're having authentication issues on IIS** |
+| **[🔐 HIMDS Challenge Token Explained](FIX-HIMDS-CHALLENGE-TOKEN.md)** | **Why manual HIMDS testing fails but your app will work** |
+| [DefaultAzureCredential Explained](DEFAULTAZURECREDENTIAL-ARC-EXPLAINED.md) | How Arc managed identity works, authentication flow, troubleshooting |
+| [Diagnose HIMDS Errors](DIAGNOSE-HIMDS-ERROR.md) | Troubleshooting "Missing Basic Authorization header" error |
+| [Diagnose-ArcAgent.ps1](Diagnose-ArcAgent.ps1) | Automated diagnostic script for Arc agent and HIMDS issues |
+| [IIS Arc Script Usage](CONFIGURE-IIS-ARC-SCRIPT-USAGE.md) | PowerShell automation for Arc identity configuration |
+| [IIS Environment Variables Guide](IIS-ENVIRONMENT-VARIABLES-GUIDE.md) | **Application-specific** config (avoid machine-level variables) |
+| [Fix Arc Authentication Error](FIX-IIS-ARC-AUTHENTICATION-ERROR.md) | Emergency fix for DefaultAzureCredential errors |
+| [Recent Fixes (Nov 15, 2025)](FIXES-APPLIED-2025-11-15.md) | Multi-subscription support, Key Vault access, PowerShell 7 compatibility |
+| [API Client Implementation](API-CLIENT-IMPLEMENTATION.md) | REST API architecture, dual authentication, hybrid services |
+| [API Client Quick Start](QUICK-START-API-CLIENT.md) | 5-minute guide to configure and test API client |
+| [Secrets Management](SECRETS-MANAGEMENT-IMPLEMENTATION.md) | Azure Key Vault integration with DefaultAzureCredential |
 
 ---
 

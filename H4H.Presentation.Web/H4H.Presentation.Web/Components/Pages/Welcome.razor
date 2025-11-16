@@ -3,14 +3,14 @@
 @layout PublicLayout
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
+@inject NavigationManager Navigation
 
 <PageTitle>Welcome to AidCircle</PageTitle>
 
 <div class="welcome-page">
     <AuthorizeView>
         <Authorized>
-            @* Redirect authenticated users to dashboard *@
-            <RedirectToHome />
+            @* Redirect authenticated users to dashboard - handled in OnInitialized *@
         </Authorized>
         <NotAuthorized>
             @* Hero Section *@
@@ -175,14 +175,21 @@
 </div>
 
 @code {
-    // Component for redirecting authenticated users
-    private class RedirectToHome : ComponentBase
-    {
-        [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
-        protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AuthenticationStateTask != null)
         {
-            Navigation.NavigateTo("/", forceLoad: false);
+            var authState = await AuthenticationStateTask;
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                // Redirect authenticated users to home (must use forceLoad to avoid NavigationException)
+                Navigation.NavigateTo("/", forceLoad: true);
+            }
         }
     }
 }

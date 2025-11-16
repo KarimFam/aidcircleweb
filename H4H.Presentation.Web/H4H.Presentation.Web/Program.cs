@@ -42,11 +42,32 @@ if (!string.IsNullOrEmpty(keyVaultName))
 {
     var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
     
+    // Configure DefaultAzureCredential with explicit options for IIS/Arc compatibility
+    var credentialOptions = new DefaultAzureCredentialOptions
+    {
+        // Exclude problematic credential types in production
+        ExcludeVisualStudioCredential = true,
+        ExcludeVisualStudioCodeCredential = true,
+        ExcludeAzureCliCredential = !builder.Environment.IsDevelopment(),
+        ExcludeAzurePowerShellCredential = true,
+        ExcludeSharedTokenCacheCredential = true,
+        ExcludeInteractiveBrowserCredential = true,
+        
+        // Explicitly set managed identity client ID from environment variable (set in web.config)
+        ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID")
+    };
+    
     // Use DefaultAzureCredential for authentication (supports local dev + Azure)
     builder.Configuration.AddAzureKeyVault(
         keyVaultUri,
-        new DefaultAzureCredential()
+        new DefaultAzureCredential(credentialOptions)
     );
+    
+    // Log credential configuration for troubleshooting
+    var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+    Console.WriteLine($"[KeyVault] Using Key Vault: {keyVaultName}");
+    Console.WriteLine($"[KeyVault] Environment: {builder.Environment.EnvironmentName}");
+    Console.WriteLine($"[KeyVault] AZURE_CLIENT_ID from environment: {(string.IsNullOrEmpty(clientId) ? "NOT SET" : clientId)}");
 }
 
 // Add AutoMapper
